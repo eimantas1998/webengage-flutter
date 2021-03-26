@@ -25,12 +25,9 @@ const String METHOD_NAME_SET_USER_MAP_ATTRIBUTE = "setUserMapAttribute";
 const String METHOD_NAME_TRACK_EVENT = "trackEvent";
 const String METHOD_NAME_TRACK_SCREEN = "trackScreen";
 
-const String callbackOnPushClick = "onPushClick";
-const String callbackOnPushActionClick = "onPushActionClick";
-const String callbackOnInAppShown = "onInAppShown";
-const String callbackOnInAppClicked = "onInAppClick";
-const String callbackOnInAppDismissed = "onInAppDismiss";
-const String callbackOnInAppPrepared = "onInAppPrepared";
+const String METHOD_NAME_ON_PUSH = "onPush";
+const String METHOD_NAME_ON_IN_APP = "onInApp";
+const String METHOD_NAME_ON_DEEP_LINK = "onDeepLink";
 
 const String CHANNEL = "channel";
 const String OPTIN = "optIn";
