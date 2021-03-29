@@ -91,14 +91,15 @@ class MethodChannelWebEngageFlutter extends WebEngageFlutterPlatform {
   }
 
   @override
-  Future<void> setUserGender(String gender) {
-    return _channel.invokeMethod(METHOD_NAME_SET_USER_GENDER, gender);
+  Future<void> setUserGender(Gender gender) {
+    return _channel.invokeMethod(
+        METHOD_NAME_SET_USER_GENDER, gender.toString().split('.').last);
   }
 
   @override
-  Future<void> setUserOptIn(String channel, bool optIn) {
-    return _channel.invokeMethod(
-        METHOD_NAME_SET_USER_OPT_IN, {CHANNEL: channel, OPTIN: optIn});
+  Future<void> setUserOptIn(OptInChannel channel, bool optIn) {
+    return _channel.invokeMethod(METHOD_NAME_SET_USER_OPT_IN,
+        {CHANNEL: channel.toString().split('.').last, OPTIN: optIn});
   }
 
   @override

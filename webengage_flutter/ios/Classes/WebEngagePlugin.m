@@ -1,22 +1,47 @@
-#import "WebEngagePlugin.h"
 #import <WebEngage/WebEngage.h>
+
+#import "WebEngagePlugin.h"
 #import "WebEngageConstants.h"
 
-static FlutterMethodChannel* channel = nil;
 NSString * const DATE_FORMAT = @"yyyy-MM-dd'T'HH:mm:ss.SSS'Z'";
 int const DATE_FORMAT_LENGTH = 24;
 
-@implementation WebEngagePlugin
-+ (void)registerWithRegistrar:(NSObject<FlutterPluginRegistrar>*)registrar {
-    channel = [FlutterMethodChannel methodChannelWithName:WEBENGAGE_PLUGIN binaryMessenger:[registrar messenger]];
-    WebEngagePlugin* instance = [[WebEngagePlugin alloc] init];
+@implementation WebEngagePlugin {
+    FlutterMethodChannel *_channel;
+    NSObject<FlutterPluginRegistrar> *_registrar;
+}
+
+- (instancetype)initWithFlutterMethodChannel:(FlutterMethodChannel *)channel
+                   andFlutterPluginRegistrar:(NSObject<FlutterPluginRegistrar> *)registrar {
+    self = [super init];
+    if (self) {
+        _channel = channel;
+        _registrar = registrar;
+    }
+    return self;
+}
+
++ (void)registerWithRegistrar:(NSObject<FlutterPluginRegistrar> *)registrar {
+    FlutterMethodChannel *channel = [FlutterMethodChannel methodChannelWithName:WEBENGAGE_PLUGIN binaryMessenger:[registrar messenger]];
+    id instance = [[WebEngagePlugin alloc] initWithFlutterMethodChannel:channel andFlutterPluginRegistrar:registrar];
     [registrar addMethodCallDelegate:instance channel:channel];
 }
 
-- (void) handleMethodCall:(FlutterMethodCall*)call result:(FlutterResult)result {
-    if ([METHOD_NAME_GET_PLATFORM_VERSION isEqualToString:call.method]) {
-        result([PARAM_PLATFORM_VALUE stringByAppendingString:[[UIDevice currentDevice] systemVersion]]);
-    } else if ([METHOD_NAME_SET_USER_LOGIN isEqualToString:call.method]) {
+- (BOOL)application:(UIApplication *)application didFinishLaunchingWithOptions:(NSDictionary *)launchOptions {
+    [[WebEngage sharedInstance] application:application didFinishLaunchingWithOptions:launchOptions notificationDelegate:self];
+    [WebEngage sharedInstance].pushNotificationDelegate = self;
+    return YES;
+}
+
+- (BOOL)application:(UIApplication *)application continueUserActivity:(NSUserActivity *)userActivity restorationHandler:(void (^)(NSArray *_Nonnull))restorationHandler {
+    [[[WebEngage sharedInstance] deeplinkManager] getAndTrackDeeplink:userActivity.webpageURL callbackBlock:^(id location){
+        [self trackDeeplinkURLCallback:location];
+    }];
+    return YES;
+}
+
+- (void)handleMethodCall:(FlutterMethodCall *)call result:(FlutterResult)result {
+    if ([METHOD_NAME_SET_USER_LOGIN isEqualToString:call.method]) {
         [self userLogin:call withResult:result];
     } else if ([METHOD_NAME_SET_USER_LOGOUT isEqualToString:call.method]) {
         [self userLogout:call withResult:result];
@@ -46,105 +71,115 @@ int const DATE_FORMAT_LENGTH = 24;
         [self trackEvent:call withResult:result];
     } else if ([METHOD_NAME_TRACK_SCREEN isEqualToString:call.method]) {
         [self trackScreen:call withResult:result];
-    }else if ([METHOD_NAME_SET_USER_ATTRIBUTE isEqualToString:call.method]) {
+    } else if ([METHOD_NAME_SET_USER_ATTRIBUTE isEqualToString:call.method]) {
         [self setUserAttribute:call withResult:result];
-    }else if ([METHOD_NAME_SET_USER_MAP_ATTRIBUTE isEqualToString:call.method]) {
+    } else if ([METHOD_NAME_SET_USER_MAP_ATTRIBUTE isEqualToString:call.method]) {
         [self setUserAttributes:call withResult:result];
-    } else if ([METHOD_NAME_INITIALISE isEqualToString:call.method]) {
-        NSLog(@"METHOD_NAME_INITIALISE");
     } else {
         result(FlutterMethodNotImplemented);
     }
-}
-
-- (void) initialisePlugin:(FlutterMethodCall *)call withResult:(FlutterResult)result {
-    NSString * userId = call.arguments;
-    WEGUser * weUser = [WebEngage sharedInstance].user;
-    [weUser login:userId];
 }
 
 - (void) userLogin:(FlutterMethodCall *)call withResult:(FlutterResult)result {
     NSString * userId = call.arguments;
     WEGUser * weUser = [WebEngage sharedInstance].user;
     [weUser login:userId];
+    result(nil);
 }
 
 - (void) userLogout:(FlutterMethodCall *)call withResult:(FlutterResult)result {
     WEGUser * weUser = [WebEngage sharedInstance].user;
     [weUser logout];
+    result(nil);
 }
 
 - (void) setUserFirstName:(FlutterMethodCall *)call withResult:(FlutterResult)result {
     NSString * firstName = call.arguments;
     WEGUser * weUser = [WebEngage sharedInstance].user;
     [weUser setFirstName:firstName];
+    result(nil);
 }
 
 - (void) setUserLastName:(FlutterMethodCall *)call withResult:(FlutterResult)result {
     NSString * lastName = call.arguments;
     WEGUser * weUser = [WebEngage sharedInstance].user;
     [weUser setLastName:lastName];
+    result(nil);
 }
 
 - (void) setUserEmail:(FlutterMethodCall *)call withResult:(FlutterResult)result {
     NSString * email = call.arguments;
     WEGUser * weUser = [WebEngage sharedInstance].user;
     [weUser setEmail:email];
+    result(nil);
 }
 
 - (void) setUserHashedEmail:(FlutterMethodCall *)call withResult:(FlutterResult)result {
     NSString * hashedEmail = call.arguments;
     WEGUser * weUser = [WebEngage sharedInstance].user;
     [weUser setHashedEmail:hashedEmail];
+    result(nil);
 }
 
 - (void) setUserPhone:(FlutterMethodCall *)call withResult:(FlutterResult)result {
     NSString * phone = call.arguments;
     WEGUser* weUser = [WebEngage sharedInstance].user;
     [weUser setPhone:phone];
+    result(nil);
 }
 
 - (void) setUserHashedPhone:(FlutterMethodCall *)call withResult:(FlutterResult)result {
     NSString * hashedPhone = call.arguments;
     WEGUser * weUser = [WebEngage sharedInstance].user;
     [weUser setHashedPhone:hashedPhone];
+    result(nil);
 }
 
 - (void) setUserCompany:(FlutterMethodCall *)call withResult:(FlutterResult)result {
     NSString * company = call.arguments;
     WEGUser * weUser = [WebEngage sharedInstance].user;
     [weUser setCompany:company];
+    result(nil);
 }
 
 - (void) setUserBirthDate:(FlutterMethodCall *)call withResult:(FlutterResult)result {
     NSString * birthDate = call.arguments;
     WEGUser * weUser = [WebEngage sharedInstance].user;
     [weUser setBirthDateString:birthDate];
+    result(nil);
 }
 
 - (void) setUserGender:(FlutterMethodCall *)call withResult:(FlutterResult)result {
     NSString * gender = call.arguments;
     WEGUser * weUser = [WebEngage sharedInstance].user;
     [weUser setGender:gender];
+    result(nil);
 }
 
 - (void) setUserOptIn:(FlutterMethodCall *)call withResult:(FlutterResult)result {
     NSString * channel = call.arguments[CHANNEL];
     NSLocale* locale = [NSLocale localeWithLocaleIdentifier:@"en_US"];
     NSString* ch = [channel lowercaseStringWithLocale:locale];
-
+    
     BOOL status = call.arguments[OPTIN];
-
+    
+    WEGUser * weUser = [WebEngage sharedInstance].user;
+    
     if ([ch isEqualToString:PUSH]) {
-        [[WebEngage sharedInstance].user setOptInStatusForChannel:WEGEngagementChannelPush status:status];
+        [weUser setOptInStatusForChannel:WEGEngagementChannelPush status:status];
+        result(nil);
     } else if ([ch isEqualToString:SMS]) {
-        [[WebEngage sharedInstance].user setOptInStatusForChannel:WEGEngagementChannelSMS status:status];
+        [weUser setOptInStatusForChannel:WEGEngagementChannelSMS status:status];
+        result(nil);
     } else if ([ch isEqualToString:EMAIL]) {
-        [[WebEngage sharedInstance].user setOptInStatusForChannel:WEGEngagementChannelEmail status:status];
+        [weUser setOptInStatusForChannel:WEGEngagementChannelEmail status:status];
+        result(nil);
     } else if ([ch isEqualToString:IN_APP]) {
-        [[WebEngage sharedInstance].user setOptInStatusForChannel:WEGEngagementChannelInApp status:status];
+        [weUser setOptInStatusForChannel:WEGEngagementChannelInApp status:status];
+        result(nil);
     } else if ([ch isEqualToString:WHATSAPP]) {
-        [[WebEngage sharedInstance].user setOptInStatusForChannel:WEGEngagementChannelWhatsapp status:status];
+        [weUser setOptInStatusForChannel:WEGEngagementChannelWhatsapp status:status];
+        result(nil);
     } else {
         NSString * msg = [NSString stringWithFormat:@"Invalid channel: %@. Must be one of [push, sms, email, in_app, whatsapp].", ch];
         result([FlutterError errorWithCode:@"WebEngagePlugin" message:msg details:nil]);
@@ -156,6 +191,7 @@ int const DATE_FORMAT_LENGTH = 24;
     NSNumber * lng = call.arguments[LNG];
     WEGUser * weUser = [WebEngage sharedInstance].user;
     [weUser setUserLocationWithLatitude:lat andLongitude:lng];
+    result(nil);
 }
 
 - (void) trackEvent:(FlutterMethodCall *)call withResult:(FlutterResult)result {
@@ -168,6 +204,7 @@ int const DATE_FORMAT_LENGTH = 24;
     else{
         [weAnalytics trackEventWithName:eventName];
     }
+    result(nil);
 }
 
 - (void) trackScreen:(FlutterMethodCall *)call withResult:(FlutterResult)result {
@@ -180,32 +217,35 @@ int const DATE_FORMAT_LENGTH = 24;
     else{
         [weAnalytics navigatingToScreenWithName:screenName];
     }
+    result(nil);
 }
 
 - (void) setUserAttribute:(FlutterMethodCall *)call withResult:(FlutterResult)result {
     NSString* attributeName = call.arguments[ATTRIBUTE_NAME];
     id value = call.arguments[ATTRIBUTES];
+    WEGUser * weUser = [WebEngage sharedInstance].user;
     if ([value isKindOfClass:[NSString class]]) {
         if ([value length] == DATE_FORMAT_LENGTH) {
             NSDate * date = [self getDate:value];
             if (date != nil) {
-                [[WebEngage sharedInstance].user setAttribute:attributeName withDateValue:date];
+                [weUser setAttribute:attributeName withDateValue:date];
             } else {
-                [[WebEngage sharedInstance].user setAttribute:attributeName withStringValue:value];
+                [weUser setAttribute:attributeName withStringValue:value];
             }
         } else {
-            [[WebEngage sharedInstance].user setAttribute:attributeName withStringValue:value];
+            [weUser setAttribute:attributeName withStringValue:value];
         }
     }
     else if ([value isKindOfClass:[NSNumber class]]) {
-        [[WebEngage sharedInstance].user setAttribute:attributeName withValue:value];
+        [weUser setAttribute:attributeName withValue:value];
     }
     else if ([value isKindOfClass:[NSArray class]]) {
-        [[WebEngage sharedInstance].user setAttribute:attributeName withArrayValue:value];
+        [weUser setAttribute:attributeName withArrayValue:value];
     }
     else if ([value isKindOfClass:[NSDate class]]) {
-        [[WebEngage sharedInstance].user setAttribute:attributeName withDateValue:value];
+        [weUser setAttribute:attributeName withDateValue:value];
     }
+    result(nil);
 }
 
 - (void) setUserAttributes:(FlutterMethodCall *)call withResult:(FlutterResult)result {
@@ -214,7 +254,8 @@ int const DATE_FORMAT_LENGTH = 24;
     if ([value isKindOfClass:[NSDictionary class]]) {
         [[WebEngage sharedInstance].user setAttribute:attributeName withDictionaryValue:value];
     }
-
+    result(nil);
+    
 }
 
 - (NSDate *)getDate:(NSString *)strValue {
@@ -226,31 +267,34 @@ int const DATE_FORMAT_LENGTH = 24;
 }
 
 -(void)WEGHandleDeeplink:(NSString *)deeplink userData:(NSDictionary *)data{
-    NSDictionary *payload = @{@"deeplink":deeplink,@"data":data};
-    [channel invokeMethod:METHOD_NAME_ON_PUSH_CLICK arguments:payload];
+    NSDictionary *payload = @{LINK:deeplink,DATA:data};
+    [_channel invokeMethod:METHOD_NAME_ON_PUSH arguments:payload];
 }
 
 -(NSDictionary *)notificationPrepared:(NSDictionary<NSString *,id> *)inAppNotificationData shouldStop:(BOOL *)stopRendering{
-    [channel invokeMethod:METHOD_NAME_ON_INAPP_PREPARED arguments:inAppNotificationData];
+    NSDictionary *payload = @{STATE:IN_APP_STATE_PREPARED,DATA:inAppNotificationData};
+    [_channel invokeMethod:METHOD_NAME_ON_IN_APP arguments:payload];
     return inAppNotificationData;
 }
 
 -(void)notificationShown:(NSDictionary<NSString *,id> *)inAppNotificationData{
-    [channel invokeMethod:METHOD_NAME_ON_INAPP_SHOWN arguments:inAppNotificationData];
+    NSDictionary *payload = @{STATE:IN_APP_STATE_SHOWN,DATA:inAppNotificationData};
+    [_channel invokeMethod:METHOD_NAME_ON_IN_APP arguments:payload];
 }
 
 -(void)notificationDismissed:(NSDictionary<NSString *,id> *)inAppNotificationData{
-    [channel invokeMethod:METHOD_NAME_ON_INAPP_DISMISS arguments:inAppNotificationData];
+    NSDictionary *payload = @{STATE:IN_APP_STATE_DISSMISSED,DATA:inAppNotificationData};
+    [_channel invokeMethod:METHOD_NAME_ON_IN_APP arguments:payload];
 }
 
 -(void)notification:(NSMutableDictionary<NSString *,id> *)inAppNotificationData clickedWithAction:(NSString *)actionId{
-    [inAppNotificationData setObject:actionId forKey:@"selectedActionId"];
-    [channel invokeMethod:METHOD_NAME_ON_INAPP_CLICKED arguments:inAppNotificationData];
+    [inAppNotificationData setObject:actionId forKey:SELECTED_ACTION_ID];
+    NSDictionary *payload = @{STATE:IN_APP_STATE_CLICKED,DATA:inAppNotificationData};
+    [_channel invokeMethod:METHOD_NAME_ON_IN_APP arguments:payload];
 }
 
 - (void)trackDeeplinkURLCallback:(NSString *)redirectLocationURL {
-   // NSLog(@"trackDeeplinkURLCallback %@", redirectLocationURL);
-    [channel invokeMethod:METHOD_TRACK_DEEPLINK_URL arguments:redirectLocationURL];
+    [_channel invokeMethod:METHOD_NAME_ON_DEEP_LINK arguments:redirectLocationURL];
 }
 
 @end

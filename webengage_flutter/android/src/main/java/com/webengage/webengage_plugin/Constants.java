@@ -1,10 +1,9 @@
 package com.webengage.webengage_plugin;
 
 public interface Constants {
-     String WEBENGAGE_PLUGIN = "webengage_flutter";
+    String WEBENGAGE_PLUGIN = "webengage_flutter";
 
     interface MethodName {
-        String METHOD_NAME_INITIALISE = "initialise";
         String METHOD_NAME_SET_USER_LOGIN = "userLogin";
         String METHOD_NAME_SET_USER_LOGOUT = "userLogout";
         String METHOD_NAME_SET_USER_FIRST_NAME = "setUserFirstName";
@@ -20,47 +19,42 @@ public interface Constants {
         String METHOD_NAME_SET_USER_LOCATION = "setUserLocation";
         String METHOD_NAME_SET_USER_ATTRIBUTE = "setUserAttribute";
         String METHOD_NAME_SET_USER_STRING_ATTRIBUTE = "setUserStringAttribute";
-        String METHOD_NAME_SET_USER_INT_ATTRIBUTE = "setUserIntAttribute";
-        String METHOD_NAME_SET_USER_DOUBLE_ATTRIBUTE = "setUserDoubleAttribute";
-        String METHOD_NAME_SET_USER_BOOL_ATTRIBUTE = "setUserBoolAttribute";
-        String METHOD_NAME_SET_USER_DATE_ATTRIBUTE = "setUserDateAttribute";
-        String METHOD_NAME_SET_USER_LIST_ATTRIBUTE = "setUserListAttribute";
         String METHOD_NAME_SET_USER_MAP_ATTRIBUTE = "setUserMapAttribute";
         String METHOD_NAME_TRACK_EVENT = "trackEvent";
         String METHOD_NAME_TRACK_SCREEN = "trackScreen";
-        String METHOD_NAME_ON_PUSH_CLICK = "onPushClick";
-        String METHOD_NAME_ON_PUSH_ACTION_CLICK = "onPushActionClick";
-        String METHOD_NAME_ON_INAPP_SHOWN = "onInAppShown";
-        String METHOD_NAME_ON_INAPP_CLICKED = "onInAppClick";
-        String METHOD_NAME_ON_INAPP_DISMISS = "onInAppDismiss";
-        String METHOD_NAME_ON_INAPP_PREPARED = "onInAppPrepared";
+        String METHOD_NAME_ON_PUSH = "onPush";
+        String METHOD_NAME_ON_IN_APP = "onInApp";
+        String METHOD_NAME_ON_DEEP_LINK = "onDeepLink";
     }
 
     interface PARAM {
-        String PARAM_PLATFORM = "platform";
-        String PARAM_PAYLOAD = "payload";
-        String PARAM_PLATFORM_VALUE = "android";
+        String DATA = "data";
+        String LINK = "link";
+        String STATE = "state";
+        String IN_APP_STATE_PREPARED = "prepared";
+        String IN_APP_STATE_SHOWN = "shown";
+        String IN_APP_STATE_DISSMISSED = "dissmissed";
+        String IN_APP_STATE_CLICKED = "clicked";
+        String SELECTED_ACTION_ID = "selectedActionId";
     }
 
     interface ARGS {
         String CHANNEL = "channel";
         String OPTIN = "optIn";
+        String PUSH = "push";
+        String SMS = "sms";
+        String EMAIL = "email";
+        String IN_APP = "in_app";
+        String WHATSAPP = "whatsapp";
+        String MALE = "male";
+        String FEMALE = "female";
+        String OTHER = "other";
         String LAT = "lat";
         String LNG = "lng";
         String EVENT_NAME = "eventName";
         String ATTRIBUTES = "attributes";
-        String ATTRIBUTE_NAME = "attributeName";
         String SCREEN_NAME = "screenName";
         String SCREEN_DATA = "screenData";
-        String MALE = "male";
-        String FEMALE = "female";
-        String OTHER = "other";
-        String PUSH = "push";
-        String SMS = "sms";
-        String IN_APP = "in_app";
-        String EMAIL = "email";
-        String WHATSAPP = "whatsapp";
-        String SELECTED_ACTION_ID = "selectedActionId";
+        String ATTRIBUTE_NAME = "attributeName";
     }
-
 }

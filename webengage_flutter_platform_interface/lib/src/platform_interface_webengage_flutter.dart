@@ -2,6 +2,7 @@ import 'dart:async';
 
 import 'package:plugin_platform_interface/plugin_platform_interface.dart';
 
+import 'constants.dart';
 import 'in_app_message.dart';
 import 'method_channel_webengage_flutter.dart';
 import 'push_notification.dart';
@@ -75,11 +76,11 @@ abstract class WebEngageFlutterPlatform extends PlatformInterface {
     throw UnimplementedError('setUserBirthDate() has not been implemented.');
   }
 
-  Future<void> setUserGender(String gender) {
+  Future<void> setUserGender(Gender gender) {
     throw UnimplementedError('setUserGender() has not been implemented.');
   }
 
-  Future<void> setUserOptIn(String channel, bool optIn) {
+  Future<void> setUserOptIn(OptInChannel channel, bool optIn) {
     throw UnimplementedError('setUserOptIn() has not been implemented.');
   }
 

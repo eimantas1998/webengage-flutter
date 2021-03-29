@@ -115,7 +115,7 @@ class _MyAppState extends State<MyApp> {
               new ListTile(
                 title: Text("Set User Gender"),
                 onTap: () {
-                  _webEngagePlugin.setUserGender('male');
+                  _webEngagePlugin.setUserGender(Gender.male);
                   showToast("Gender - Male");
                 },
               ),
@@ -136,20 +136,20 @@ class _MyAppState extends State<MyApp> {
               new ListTile(
                 title: Text("Opt-In  Push, InApp,email,sms"),
                 onTap: () {
-                  _webEngagePlugin.setUserOptIn('in_app', true);
-                  _webEngagePlugin.setUserOptIn('sms', true);
-                  _webEngagePlugin.setUserOptIn('push', true);
-                  _webEngagePlugin.setUserOptIn('email', true);
+                  _webEngagePlugin.setUserOptIn(OptInChannel.in_app, true);
+                  _webEngagePlugin.setUserOptIn(OptInChannel.sms, true);
+                  _webEngagePlugin.setUserOptIn(OptInChannel.push, true);
+                  _webEngagePlugin.setUserOptIn(OptInChannel.email, true);
                   showToast("Opt-In  Push, InApp,email,sms ");
                 },
               ),
               new ListTile(
                 title: Text("Opt-Out  Push, InApp,email,sms"),
                 onTap: () {
-                  _webEngagePlugin.setUserOptIn('in_app', false);
-                  _webEngagePlugin.setUserOptIn('sms', false);
-                  _webEngagePlugin.setUserOptIn('push', false);
-                  _webEngagePlugin.setUserOptIn('email', false);
+                  _webEngagePlugin.setUserOptIn(OptInChannel.in_app, false);
+                  _webEngagePlugin.setUserOptIn(OptInChannel.sms, false);
+                  _webEngagePlugin.setUserOptIn(OptInChannel.push, false);
+                  _webEngagePlugin.setUserOptIn(OptInChannel.email, false);
                   showToast("Opt-Out  Push, InApp,email,sms ");
                 },
               ),

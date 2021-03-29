@@ -1,40 +1,26 @@
+import 'constants.dart';
+
 class InAppMessage {
   const InAppMessage({
     required this.state,
-    this.title,
-    this.body,
-    this.action,
+    required this.data,
   });
 
   /// Constructs a [InAppMessage] from a raw Map.
   factory InAppMessage.fromMap(Map<String, dynamic> map) {
+    var data = Map<String, dynamic>.from(map[DATA] ?? {});
     return InAppMessage(
       state: InAppMessageState.values.firstWhere(
         (element) => element.toString().split('.').last == map['state'],
-        orElse: () => InAppMessageState.clicked,
+        orElse: () => InAppMessageState.prepared,
       ),
-      title: map['title'],
-      body: map['body'],
-      action: map['action'],
+      data: data,
     );
   }
 
   /// The in app message title.
   final InAppMessageState state;
 
-  /// The in app message title.
-  final String? title;
-
-  /// The in app message content.
-  final String? body;
-
-  /// The in app message action.
-  final String? action;
-}
-
-enum InAppMessageState {
-  prepared,
-  shown,
-  dissmissed,
-  clicked,
+  /// The in app message data.
+  final Map<String, dynamic>? data;
 }

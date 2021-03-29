@@ -1,37 +1,24 @@
+import 'constants.dart';
+
 class PushNotification {
   const PushNotification({
-    this.title,
-    this.body,
-    this.link,
-    this.action,
-    this.payload,
+    required this.link,
+    required this.data,
   });
 
   /// Constructs a [PushNotification] from a raw Map.
   factory PushNotification.fromMap(Map<String, dynamic> map) {
+    print(map);
+    var data = Map<String, dynamic>.from(map[DATA] ?? {});
     return PushNotification(
-      title: map['title'],
-      body: map['body'],
-      link: map['link'],
-      action: map['action'],
-      payload: map['payload'] != null
-          ? Map<String, dynamic>.from(map['payload'])
-          : null,
+      link: map[LINK],
+      data: data,
     );
   }
-
-  /// The notification title.
-  final String? title;
-
-  /// The notification body content.
-  final String? body;
 
   /// The notification deeplink.
   final String? link;
 
-  /// The notification action.
-  final String? action;
-
-  /// The notification payload.
-  final Map<String, dynamic>? payload;
+  /// The notification data.
+  final Map<String, dynamic> data;
 }

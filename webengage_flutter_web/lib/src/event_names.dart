@@ -1,0 +1,13 @@
+const String FIRST_NAME = 'we_first_name';
+const String LAST_NAME = 'we_last_name';
+const String EMAIL = 'we_email';
+const String HASHED_EMAIL = 'we_hashed_email';
+const String PHONE = 'we_phone';
+const String HASHED_PHONE = 'we_hashed_phone';
+const String COMPANY = 'we_company';
+const String BIRTHDATE = 'we_birth_date';
+const String GENDER = 'we_gender';
+const String OPTIN_EMAIL = 'we_email_opt_in';
+const String OPTIN_SMS = 'we_sms_opt_in';
+const String OPTIN_WHATSAPP = 'we_whatsapp_opt_in';
+const String OPTIN_PUSH = 'we_push_opt_in';
