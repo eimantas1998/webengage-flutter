@@ -191,6 +191,15 @@ packages:
       url: "git://github.com/algirdasmac/webengage-flutter"
     source: git
     version: "2.0.0"
+  webengage_flutter_web:
+    dependency: "direct main"
+    description:
+      path: webengage_flutter_web
+      ref: federated
+      resolved-ref: f4fc55d6670fa2d3029b16b13341f7a1c4acde0a
+      url: "git://github.com/algirdasmac/webengage-flutter"
+    source: git
+    version: "2.0.0"
 sdks:
   dart: ">=2.12.0 <3.0.0"
   flutter: ">=1.22.0"

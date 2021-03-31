@@ -19,6 +19,11 @@ dependencies:
       url: git://github.com/algirdasmac/webengage-flutter
       path: webengage_flutter_platform_interface
       ref: federated
+  webengage_flutter_web:
+    git:
+      url: git://github.com/algirdasmac/webengage-flutter
+      path: webengage_flutter_web
+      ref: federated
 
 dev_dependencies:
   flutter_test:
@@ -32,3 +37,5 @@ flutter:
         pluginClass: WebEngagePlugin
       ios:
         pluginClass: WebEngagePlugin
+      web:
+        default_package: webengage_flutter_web
