@@ -43,7 +43,6 @@ public class WebEngagePlugin implements FlutterPlugin, MethodCallHandler, Activi
 
     @Override
     public void onAttachedToEngine(FlutterPluginBinding flutterPluginBinding) {
-        Log.d(TAG, "onAttachedToEngine on thread: " + Thread.currentThread().getName());
         this.channel = new MethodChannel(flutterPluginBinding.getBinaryMessenger(), WEBENGAGE_PLUGIN);
         channel.setMethodCallHandler(this);
         this.isAttachedToEngine = true;
@@ -64,7 +63,6 @@ public class WebEngagePlugin implements FlutterPlugin, MethodCallHandler, Activi
 
     @Override
     public void onDetachedFromEngine(FlutterPluginBinding binding) {
-        Log.d(TAG, "onDetachedFromEngine");
         this.isAttachedToEngine = false;
         channel.setMethodCallHandler(null);
     }
@@ -323,26 +321,22 @@ public class WebEngagePlugin implements FlutterPlugin, MethodCallHandler, Activi
 
     @Override
     public void onAttachedToActivity(ActivityPluginBinding binding) {
-        Log.d(TAG, "onAttachedToActivity");
         this.activity = binding.getActivity();
         WebEngage.get().analytics().start(activity);
     }
 
     @Override
     public void onReattachedToActivityForConfigChanges(ActivityPluginBinding binding) {
-        Log.d(TAG, "onReattachedToActivityForConfigChanges");
         onAttachedToActivity(binding);
     }
 
     @Override
     public void onDetachedFromActivity() {
-        Log.d(TAG, "onDetachedFromActivity");
         WebEngage.get().analytics().stop(activity);
     }
 
     @Override
     public void onDetachedFromActivityForConfigChanges() {
-        Log.d(TAG, "onDetachedFromActivityForConfigChanges");
         onDetachedFromActivity();
     }
 }

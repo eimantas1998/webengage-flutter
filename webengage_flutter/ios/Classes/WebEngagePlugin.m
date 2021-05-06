@@ -19,7 +19,6 @@ NSString *const kMessagingPresentationOptionsUserDefaults =
 }
 
 + (void)registerWithRegistrar:(NSObject<FlutterPluginRegistrar> *)registrar {
-    NSLog(@"[WebEngagePlugin] registerWithRegistrar");
     FlutterMethodChannel *channel = [FlutterMethodChannel methodChannelWithName:WEBENGAGE_PLUGIN binaryMessenger:[registrar messenger]];
     id instance = [[WebEngagePlugin alloc] initWithFlutterMethodChannel:channel andFlutterPluginRegistrar:registrar];
     [WebEngage sharedInstance].pushNotificationDelegate = instance;
@@ -28,12 +27,10 @@ NSString *const kMessagingPresentationOptionsUserDefaults =
 }
 
 - (BOOL)application:(UIApplication *)application didFinishLaunchingWithOptions:(NSDictionary *)launchOptions {
-    NSLog(@"[WebEngagePlugin] didFinishLaunchingWithOptions");
     return [[WebEngage sharedInstance] application:application didFinishLaunchingWithOptions:launchOptions notificationDelegate:self];
 }
 
 - (BOOL)application:(UIApplication *)application continueUserActivity:(NSUserActivity *)userActivity restorationHandler:(void (^)(NSArray *))restorationHandler {
-    NSLog(@"[WebEngagePlugin] continueUserActivity");
     [[[WebEngage sharedInstance] deeplinkManager] getAndTrackDeeplink:userActivity.webpageURL callbackBlock:^(id location){
         [self trackDeeplinkURLCallback:location];
     }];
@@ -349,7 +346,6 @@ NSString *const kMessagingPresentationOptionsUserDefaults =
 
 - (void)userNotificationCenter:(UNUserNotificationCenter *)center willPresentNotification:(UNNotification *)notification withCompletionHandler:(void (^)(UNNotificationPresentationOptions options))completionHandler {
     if ([notification.request.content.userInfo[@"source"] isEqual:@"webengage"]) {
-        NSLog(@"[WebEngagePlugin] willPresentNotification");
         NSMutableDictionary *customData = [[NSMutableDictionary alloc] init];
         for (NSDictionary* pair in notification.request.content.userInfo[@"customData"])
         {
@@ -384,7 +380,6 @@ NSString *const kMessagingPresentationOptionsUserDefaults =
 - (void)userNotificationCenter:(UNUserNotificationCenter *)center didReceiveNotificationResponse:(UNNotificationResponse *)response withCompletionHandler:(void(^)(void))completionHandler {
     if ([response.actionIdentifier isEqualToString:UNNotificationDismissActionIdentifier] &&
         [response.notification.request.content.userInfo[@"source"] isEqual:@"webengage"]) {
-        NSLog(@"[WebEngagePlugin] didReceiveNotificationResponse");
         NSMutableDictionary *customData = [[NSMutableDictionary alloc] init];
         for (NSDictionary* pair in response.notification.request.content.userInfo[@"customData"])
         {
@@ -402,7 +397,6 @@ NSString *const kMessagingPresentationOptionsUserDefaults =
 }
 
 - (void)WEGHandleDeeplink:(NSString *)deeplink userData:(NSDictionary *)data {
-    NSLog(@"[WebEngagePlugin] WEGHandleDeeplink");
     NSMutableDictionary *customData = [[NSMutableDictionary alloc] init];
     for (NSDictionary* pair in data[@"customData"])
     {
@@ -419,7 +413,6 @@ NSString *const kMessagingPresentationOptionsUserDefaults =
 }
 
 - (NSDictionary *)notificationPrepared:(NSDictionary<NSString *,id> *)inAppNotificationData shouldStop:(BOOL *)stopRendering {
-    NSLog(@"[WebEngagePlugin] notificationPrepared");
     NSDictionary *payload = @{
         STATE:IN_APP_STATE_PREPARED,
         DATA:inAppNotificationData,
@@ -429,7 +422,6 @@ NSString *const kMessagingPresentationOptionsUserDefaults =
 }
 
 - (void)notificationShown:(NSDictionary<NSString *,id> *)inAppNotificationData {
-    NSLog(@"[WebEngagePlugin] notificationShown");
     NSDictionary *payload = @{
         STATE:IN_APP_STATE_SHOWN,
         DATA:inAppNotificationData,
@@ -438,7 +430,6 @@ NSString *const kMessagingPresentationOptionsUserDefaults =
 }
 
 - (void)notificationDismissed:(NSDictionary<NSString *,id> *)inAppNotificationData {
-    NSLog(@"[WebEngagePlugin] notificationDismissed");
     NSDictionary *payload = @{
         STATE:IN_APP_STATE_DISMISSED,
         DATA:inAppNotificationData,
@@ -447,7 +438,6 @@ NSString *const kMessagingPresentationOptionsUserDefaults =
 }
 
 - (void)notification:(NSMutableDictionary<NSString *,id> *)inAppNotificationData clickedWithAction:(NSString *)actionId {
-    NSLog(@"[WebEngagePlugin] notification clickedWithAction");
     NSMutableDictionary *payload = [[NSMutableDictionary alloc] init];
     [payload setValue:IN_APP_STATE_CLICKED forKey:STATE];
     [payload setValue:inAppNotificationData forKey:DATA];
@@ -464,7 +454,6 @@ NSString *const kMessagingPresentationOptionsUserDefaults =
 }
 
 - (void)trackDeeplinkURLCallback:(NSString *)redirectLocationURL {
-    NSLog(@"[WebEngagePlugin] trackDeeplinkURLCallback");
     [_channel invokeMethod:METHOD_NAME_ON_DEEP_LINK arguments:redirectLocationURL];
 }
 

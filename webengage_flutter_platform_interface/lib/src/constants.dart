@@ -31,13 +31,13 @@ const String MESSAGE = 'message';
 enum InAppMessageState {
   prepared,
   shown,
-  dissmissed,
+  dismissed,
   clicked,
 }
 
 enum PushNotificationState {
   shown,
-  dissmissed,
+  dismissed,
   clicked,
 }
 

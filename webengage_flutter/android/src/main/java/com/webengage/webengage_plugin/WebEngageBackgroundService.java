@@ -22,17 +22,14 @@ public class WebEngageBackgroundService extends JobIntentService {
     protected void onHandleWork(@NonNull Intent intent) {
         synchronized (messagingQueue) {
             if (WebEngagePlugin.isInitialised) {
-                Log.d(Constants.TAG, "WebEngagePlugin is started, message will be handled.");
                 handleIntent(intent);
             } else {
-                Log.d(Constants.TAG, "WebEngagePlugin has not yet started, messages will be queued.");
                 messagingQueue.add(intent);
             }
         }
     }
 
     public static void enqueueMessageProcessing(Context context, Intent messageIntent) {
-        Log.d(Constants.TAG, "WebEngageBackgroundService enqueueMessageProcessing.");
         enqueueWork(
                 context,
                 WebEngageBackgroundService.class,
@@ -44,7 +41,6 @@ public class WebEngageBackgroundService extends JobIntentService {
     }
 
     static void onInitialized() {
-        Log.d(Constants.TAG, "WebEngageBackgroundService onInitialized");
         synchronized (messagingQueue) {
             // Handle all the message events received before the Dart isolate was
             // initialized, then clear the queue.
@@ -56,7 +52,6 @@ public class WebEngageBackgroundService extends JobIntentService {
     }
 
     private static void handleIntent(Intent intent) {
-        Log.d(Constants.TAG, "WebEngageBackgroundService handleIntent");
         RemoteMessage remoteMessage = intent.getParcelableExtra(Constants.NOTIFICATION);
         WebEngage.get().receive(remoteMessage.getData());
     }
