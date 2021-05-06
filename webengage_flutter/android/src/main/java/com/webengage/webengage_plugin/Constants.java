@@ -2,6 +2,10 @@ package com.webengage.webengage_plugin;
 
 public interface Constants {
     String WEBENGAGE_PLUGIN = "webengage_flutter";
+    String TAG = "WebEngagePlugin";
+
+    String NOTIFICATION = "notification";
+    int JOB_ID = 2021;
 
     interface MethodName {
         String METHOD_NAME_SET_USER_LOGIN = "userLogin";
@@ -18,7 +22,6 @@ public interface Constants {
         String METHOD_NAME_SET_USER_OPT_IN = "setUserOptIn";
         String METHOD_NAME_SET_USER_LOCATION = "setUserLocation";
         String METHOD_NAME_SET_USER_ATTRIBUTE = "setUserAttribute";
-        String METHOD_NAME_SET_USER_STRING_ATTRIBUTE = "setUserStringAttribute";
         String METHOD_NAME_SET_USER_MAP_ATTRIBUTE = "setUserMapAttribute";
         String METHOD_NAME_TRACK_EVENT = "trackEvent";
         String METHOD_NAME_TRACK_SCREEN = "trackScreen";
@@ -31,11 +34,17 @@ public interface Constants {
         String DATA = "data";
         String LINK = "link";
         String STATE = "state";
+        String TITLE = "title";
+        String MESSAGE = "message";
+
         String IN_APP_STATE_PREPARED = "prepared";
         String IN_APP_STATE_SHOWN = "shown";
-        String IN_APP_STATE_DISSMISSED = "dissmissed";
+        String IN_APP_STATE_DISMISSED = "dismissed";
         String IN_APP_STATE_CLICKED = "clicked";
-        String SELECTED_ACTION_ID = "selectedActionId";
+
+        String NOTIFICATION_STATE_SHOWN = "shown";
+        String NOTIFICATION_STATE_DISMISSED = "dismissed";
+        String NOTIFICATION_STATE_CLICKED = "clicked";
     }
 
     interface ARGS {

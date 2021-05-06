@@ -3,7 +3,7 @@ PODS:
   - WebEngage (5.2.4):
     - WebEngage/Xcode11 (= 5.2.4)
   - WebEngage/Xcode11 (5.2.4)
-  - webengage_flutter (2.0.0):
+  - webengage_flutter (0.0.1):
     - Flutter
     - WebEngage
 
@@ -24,7 +24,7 @@ EXTERNAL SOURCES:
 SPEC CHECKSUMS:
   Flutter: 434fef37c0980e73bb6479ef766c45957d4b510c
   WebEngage: e50708cc9dc849bd969312b603e8a7f3068ed2b0
-  webengage_flutter: e466074b54a2c247bf90dfa2825365af3eb3101f
+  webengage_flutter: 4130e29a59f14c49d12d3befab6d89f46aaea094
 
 PODFILE CHECKSUM: 8e679eca47255a8ca8067c4c67aab20e64cb974d
 

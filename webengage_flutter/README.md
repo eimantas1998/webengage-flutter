@@ -7,239 +7,64 @@ For more information checkout our [website](https://webengage.com/) and [documen
 **Add WebEngage Flutter Plugin**
 
 - Add webengage_flutter in your `pubspec.yaml` file.
+
 ```yml
 dependencies:
-webengage_flutter: 1.0.2
+webengage_flutter: 2.0.0
 ```
+
 - Run `flutter packages get` to install the SDK
 
-## Initialization
-
 ### Android
-1. Initialize WebEngage in main.dart in initState();
-```dart
-WebEngagePlugin _webEngagePlugin = new WebEngagePlugin();
-```
-2.  Initialize WebEngage Android SDK in your `<your-project>/android/app/src/main/java/<your-package-path>/MainApplication.java` class.
-```java
-...
-import com.webengage.sdk.android.WebEngageActivityLifeCycleCallbacks;
-import io.flutter.app.FlutterApplication;
 
-public class MainApplication extends FlutterApplication {
-    @Override
-    public void onCreate() {
-        super.onCreate();
-         WebEngageConfig webEngageConfig = new WebEngageConfig.Builder()
-                .setWebEngageKey("YOUR_LICENCSE_CODE")
-                .setAutoGCMRegistrationFlag(false)
-                .setLocationTrackingStrategy(LocationTrackingStrategy.ACCURACY_BEST)
-                .setDebugMode(true) // only in development mode
-                .build();
-        WebengageInitializer.initialize(this,webEngageConfig);
-        ...
-    }
-    ...
-}
-```
+1. Open the `/android/app/src/main/AndroidManifest.xml` file.
+2. Add the following meta-data element inside your application element (don't forget to add your licence code).
 
-#### Push Notifications
-
-1. Add below dependencies in app-level build gradle
-```groovy
-    implementation platform('com.google.firebase:firebase-bom:25.12.0')
-    implementation 'com.google.firebase:firebase-analytics'
-    implementation 'com.google.firebase:firebase-messaging:20.2.1'
-    implementation 'com.google.android.gms:play-services-ads:15.0.1'
-```
-2. Add the following to your dependencies section in project/build.gradle
-```groovy
-        classpath 'com.google.gms:google-services:4.3.4'
-```
-3. Firebase tokens can be passed to WebEngage using FirebaseMessagingService
- ```java
-import com.google.firebase.messaging.FirebaseMessagingService;
-import com.webengage.sdk.android.WebEngage;
-
-public class MyFirebaseMessagingService extends FirebaseMessagingService {
-    @Override
-    public void onNewToken(String s) {
-        super.onNewToken(s);
-        WebEngage.get().setRegistrationID(s);
-    }
-}
-```
-It is also recommended that you pass Firebase token to WebEngage from onCreate of your Application class as shown below. This will ensure that changes in user’s Firebase token are communicated to WebEngage.
-```java
-import com.google.android.gms.tasks.OnSuccessListener;
-import com.google.firebase.iid.FirebaseInstanceId;
-import com.google.firebase.iid.InstanceIdResult;
-import com.webengage.sdk.android.WebEngage;
-
-public class MainApplication extends FlutterApplication {
-    @Override
-    public void onCreate() {
-        super.onCreate();
-    FirebaseMessaging.getInstance().getToken()
-    .addOnCompleteListener(new OnCompleteListener<String>() {
-        @Override
-        public void onComplete(@NonNull Task<String> task) {
-          if (!task.isSuccessful()) {
-            Log.w(TAG, "Fetching FCM registration token failed", task.getException());
-            return;
-          }
-          // Get new FCM registration token
-          String token = task.getResult();
-          WebEngage.get().setRegistrationID(token);
-        }
-    });
-     
-    }
-}
-```
-4. Pass Messages to WebEngage
-Create a class that extends FirebaseMessagingService and pass messages to WebEngage.
-All incoming messages from WebEngage will contain key source with the value as webengage.
-```java
-package your.application.package;
-
-import com.google.firebase.messaging.FirebaseMessagingService;
-import com.google.firebase.messaging.RemoteMessage;
-import com.webengage.sdk.android.WebEngage;
-
-public class MyFirebaseMessagingService extends FirebaseMessagingService {
-  @Override
-  public void onMessageReceived(RemoteMessage remoteMessage) {
-    Map<String, String> data = remoteMessage.getData();
-    if(data != null) {
-      if(data.containsKey("source") && "webengage".equals(data.get("source"))) {
-        WebEngage.get().receive(data);
-      }
-    }
-  }
-}
-```
-Next, register the service to the application element of your AndroidManifest.xml as follows.
 ```xml
-<service
-    android:name=".MyFirebaseMessagingService">
-    <intent-filter>
-        <action android:name="com.google.firebase.MESSAGING_EVENT"/>
-    </intent-filter>
-</service>
+<meta-data
+            android:name="com.webengage.sdk.android.key"
+            android:value="YOUR_LICENCSE_CODE" />
 ```
 
 ### iOS
 
-1. Add WebEngage configurations `<your-project>/ios/<YourApp>/Info.plist` file.
-```
-<dict>
-	<key>WEGLicenseCode</key>
-	<string>YOUR-WEBENGAGE-LICENSE-CODE</string>
+1. Open the `/ios/Runner/Info.plist` file.
+2. Add the following key in your `<dict>...</dict>` element (don't forget to add your licence code).
 
-	<key>WEGLogLevel</key>
-	<string>VERBOSE</string>
-    ...
-</dict>
+```plist
+<key>WEGLicenseCode</key>
+<string>YOUR_LICENCSE_CODE</string>
 ```
 
-2. Initialize WebEngage iOS SDK in `<your-project>/ios/<YourApp>/AppDelegate.m` file.
-```objectivec
-#import <WebEngage/WebEngage.h>
-...
+**Push Notifications**
 
-@implementation AppDelegate
+Add below subscribeToPushCallbacks() method in main.dart and call it from initMethod()
 
-- (BOOL)application:(UIApplication *)application didFinishLaunchingWithOptions:(NSDictionary * launchOptions {
-    ...
-  
-    [[WebEngage sharedInstance] application:application didFinishLaunchingWithOptions:launchOptions];
-    
-  return [super application:application didFinishLaunchingWithOptions:launchOptions];
-}
-
-@end
-```
-
-#### Push Notifications
-**Push Notification Callbacks**
-
-1. Add Below code in AppDelegate.h file
-
-```
-  #import <WebEngagePlugin.h>
-  
-  @property (nonatomic, strong) WebEngagePlugin *bridge;
-```
-2. Add Below code in AppDelegate.m file
-
-```
-    self.bridge = [WebEngagePlugin new];
-    //For setting push click callback set pushNotificationDelegate after webengage SDK is initialised
-    
-    [[WebEngage sharedInstance] application:application didFinishLaunchingWithOptions:launchOptions notificationDelegate:self.bridge];
-    [WebEngage sharedInstance].pushNotificationDelegate = self.bridge;
-```
-
-3. Add below subscribeToPushCallbacks() method in main.dart and call it from initMethod()
 ```dart
   void subscribeToPushCallbacks() {
-      //Push click stream listener
-      _webEngagePlugin.pushStream.listen((event) {
-        String deepLink = event.deepLink;
-        Map<String, dynamic> messagePayload = event.payload;
+      WebEngagePlugin.onPush.listen((message) {
+        String title = message.title;
+        String message = message.message;
+        String? link = message.link;
+        PushNotificationState state = message.state;
+        Map<String, dynamic> data = message.data;
       });
-
-      //Push action click listener
-      _webEngagePlugin.pushActionStream.listen((event) {
-        print("pushActionStream:" + event.toString());
-        String deepLink = event.deepLink;
-        Map<String, dynamic> messagePayload = event.payload;
-      });
-  }
-```
-
-4. Add below code in dispose() of the main.dart
-```dart
-  //Close the streams in dispose()
-  @override
-  void dispose() {
-    _webEngagePlugin.pushSink.close();
-    _webEngagePlugin.pushActionSink.close();
-    super.dispose();
   }
 ```
 
 **Universal Link**
-1. Add Below code in AppDelegate.m file
-```
-  - (BOOL)application:(UIApplication *)application continueUserActivity:(NSUserActivity *)userActivity restorationHandler:(void (^)(NSArray<id<UIUserActivityRestoring>> * _Nullable))restorationHandler {
-  [[[WebEngage sharedInstance] deeplinkManager] getAndTrackDeeplink:userActivity.webpageURL callbackBlock:^(id location){
-    [self.bridge trackDeeplinkURLCallback:location];
-  }];
-  return YES;
-}
-```
 
-2. Add below subscribeToTrackUniversalLink() method in main.dart and call it from initMethod()
-```
+Add below subscribeToTrackUniversalLink() method in main.dart and call it from initMethod()
+
+```dart
  void subscribeToTrackUniversalLink() {
-    _webEngagePlugin.trackDeeplinkStream.listen((location) {
-      print("trackDeeplinkStream: " + location);
+    WebEngagePlugin.onDeepLink.listen((link) {
+      print("onDeepLinkStream: " + link);
     });
   }
 ```
 
-3. Add below code in dispose() of the main.dart
-```dart
-  //Close the streams in dispose()
-  @override
-  void dispose() {
-    _webEngagePlugin.trackDeeplinkURLStreamSink.close();
-    super.dispose();
-  }
-```
-## Track Users
+**Track Users**
 
 ```dart
 import 'package:webengage_flutter/webengage_flutter.dart';
@@ -300,7 +125,8 @@ import 'package:webengage_flutter/webengage_flutter.dart';
     WebEngagePlugin.setUserAttributes(details);
 ```
 
-## Track Events
+**Track Events**
+
 ```dart
 import 'package:webengage_flutter/webengage_flutter.dart';
 ...
@@ -311,9 +137,8 @@ import 'package:webengage_flutter/webengage_flutter.dart';
       WebEngagePlugin.trackEvent('Order Placed', {'Amount': 808.48});
 ```
 
-## In-app Notifications
+**Track Screens**
 
-### Track Screens
 ```dart
 import 'package:webengage_flutter/webengage_flutter.dart';
 ...
@@ -324,58 +149,29 @@ import 'package:webengage_flutter/webengage_flutter.dart';
     WebEngagePlugin.trackScreen('Product Page', {'Product Id': 'UHUH799'});
 ```
 
-### In-app Notification Callbacks
+**In-app Notification Callbacks**
 
-1. Add Below code in AppDelegate.h file
+Add below subscribeToInAppCallbacks() method in main.dart and call it from initMethod()
 
-```
-  #import <WebEngagePlugin.h>
-  
-  @property (nonatomic, strong) WebEngagePlugin *bridge;
-```
-2. Add Below code in AppDelegate.m file
-
-``` 
-    self.bridge = [WebEngagePlugin new];
-    //For setting in-app click callback set notificationDelegate while initialising WebEngage SDK
-    
-    [[WebEngage sharedInstance] application:application didFinishLaunchingWithOptions:launchOptions notificationDelegate:self.bridge];
-```
-3. Add Below Method in main.dart
 ```dart
- void _onInAppPrepared(Map<String, dynamic> message) {
-    print("This is a inapp Prepated callback from native to flutter. Payload " +
-        message.toString());
+  void subscribeToInAppCallbacks() {
+      WebEngagePlugin.onInApp.listen((message) {
+        String? link = message.link;
+        InAppMessageState state = message.state;
+        Map<String, dynamic> data = message.data;
+      });
   }
-  void _onInAppClick(Map<String, dynamic> message,String s) {
-    print("This is a inapp click callback from native to flutter. Payload " +
-        message.toString());
-
-  }
-
-  void _onInAppShown(Map<String, dynamic> message) {
-    print("This is a callback on inapp shown from native to flutter. Payload " +
-        message.toString());
-  }
-
-  void _onInAppDismiss(Map<String, dynamic> message) {
-    print("This is a callback on inapp dismiss from native to flutter. Payload " +
-        message.toString());
-  }
-````
-4. Add Below code inside initmethod() in main.dart
-```dart
-_webEngagePlugin.setUpInAppCallbacks(
-        _onInAppClick, _onInAppShown, _onInAppDismiss, _onInAppPrepared);
 ```
-
 
 ## More Info
+
 - Checkout the [Sample main.dart](https://github.com/WebEngage/webengage-flutter/blob/development_flutter_sdk/example/lib/main.dart) for the sample application.
 - Checkout the [developer documentation](https://docs.webengage.com/docs)
 
 ## Questions?
+
 Reach out to our [Support Team](https://webengage.com/) for further assistance.
 
 ## Plugin info
+
 [WebEngage Flutter SDK](https://pub.dev/packages/webengage_flutter)

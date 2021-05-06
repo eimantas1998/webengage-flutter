@@ -1,6 +1,7 @@
 import 'dart:async';
 
 import 'package:flutter/services.dart';
+import 'package:flutter/foundation.dart';
 
 import 'constants.dart';
 import 'in_app_message.dart';
@@ -16,7 +17,6 @@ class MethodChannelWebEngageFlutter extends WebEngageFlutterPlatform {
   MethodChannelWebEngageFlutter() {
     if (_initialized) return;
     _channel.setMethodCallHandler((MethodCall call) async {
-      print("methodCallHandler call ${call.method} ${call.arguments}");
       switch (call.method) {
         case METHOD_NAME_ON_PUSH:
           Map<String, dynamic> pushMap =
@@ -38,6 +38,58 @@ class MethodChannelWebEngageFlutter extends WebEngageFlutterPlatform {
       }
     });
     _initialized = true;
+  }
+
+  @override
+  Future<bool> requestPermission({
+    bool alert = true,
+    bool announcement = false,
+    bool badge = true,
+    bool carPlay = false,
+    bool criticalAlert = false,
+    bool provisional = false,
+    bool sound = true,
+  }) async {
+    if (defaultTargetPlatform != TargetPlatform.iOS &&
+        defaultTargetPlatform != TargetPlatform.macOS) {
+      return true;
+    }
+
+    bool? response = await _channel.invokeMethod<bool>(
+      METHOD_NAME_REQUEST_PERMISSION,
+      {
+        'alert': alert,
+        'announcement': announcement,
+        'badge': badge,
+        'carPlay': carPlay,
+        'criticalAlert': criticalAlert,
+        'provisional': provisional,
+        'sound': sound,
+      },
+    );
+
+    return response ?? false;
+  }
+
+  @override
+  Future<void> setForegroundNotificationPresentationOptions({
+    required bool alert,
+    required bool badge,
+    required bool sound,
+  }) {
+    if (defaultTargetPlatform != TargetPlatform.iOS &&
+        defaultTargetPlatform != TargetPlatform.macOS) {
+      return Future.value();
+    }
+
+    return _channel.invokeMethod(
+      METHOD_NAME_SET_FOREGROUND_NOTIFICATION_PRESENTATION_OPTIONS,
+      {
+        'alert': alert,
+        'badge': badge,
+        'sound': sound,
+      },
+    );
   }
 
   @override

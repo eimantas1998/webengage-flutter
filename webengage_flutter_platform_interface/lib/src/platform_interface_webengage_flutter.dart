@@ -36,6 +36,90 @@ abstract class WebEngageFlutterPlatform extends PlatformInterface {
     _instance = instance;
   }
 
+  /// Prompts the user for notification permissions.
+  ///
+  /// On iOS, a dialog is shown requesting the users permission.
+  /// If [provisional] is set to `true`, silent notification permissions will be
+  /// automatically granted. When notifications are delivered to the device, the
+  /// user will be presented with an option to disable notifications, keep receiving
+  /// them silently or enable prominent notifications.
+  ///
+  /// On Android, is it not required to call this method. If called however,
+  /// a boolean of value `true` will be returned.
+  Future<bool> requestPermission({
+    /// Request permission to display alerts. Defaults to `true`.
+    ///
+    /// iOS only.
+    bool alert = true,
+
+    /// Request permission for Siri to automatically read out notification messages over AirPods.
+    /// Defaults to `false`.
+    ///
+    /// iOS only.
+    bool announcement = false,
+
+    /// Request permission to update the application badge. Defaults to `true`.
+    ///
+    /// iOS only.
+    bool badge = true,
+
+    /// Request permission to display notifications in a CarPlay environment.
+    /// Defaults to `false`.
+    ///
+    /// iOS only.
+    bool carPlay = false,
+
+    /// Request permission for critical alerts. Defaults to `false`.
+    ///
+    /// Note; your application must explicitly state reasoning for enabling
+    /// critical alerts during the App Store review process or your may be
+    /// rejected.
+    ///
+    /// iOS only.
+    bool criticalAlert = false,
+
+    /// Request permission to provisionally create non-interrupting notifications.
+    /// Defaults to `false`.
+    ///
+    /// iOS only.
+    bool provisional = false,
+
+    /// Request permission to play sounds. Defaults to `true`.
+    ///
+    /// iOS only.
+    bool sound = true,
+  }) {
+    throw UnimplementedError('requestPermission() is not implemented');
+  }
+
+  /// Sets the presentation options for iOS based notifications when received in
+  /// the foreground.
+  ///
+  /// By default, on iOS devices notification messages are only shown when
+  /// the application is in the background or terminated. Calling this method
+  /// updates these settings to allow a notification to trigger feedback to the
+  /// user.
+  ///
+  /// Important: The requested permissions and those set by the user take priority
+  /// over these settings.
+  ///
+  /// - [alert] Causes a notification message to display in the foreground, overlaying
+  ///   the current application (heads up mode).
+  /// - [badge] The application badge count will be updated if the application is
+  ///   in the foreground.
+  /// - [sound] The device will trigger a sound if the application is in the foreground.
+  ///
+  /// If all arguments are `false`, a notification message will not be displayed in the
+  /// foreground.
+  Future<void> setForegroundNotificationPresentationOptions({
+    required bool alert,
+    required bool badge,
+    required bool sound,
+  }) {
+    throw UnimplementedError(
+        'setForegroundNotificationPresentationOptions() is not implemented');
+  }
+
   Future<void> userLogin(String userId) {
     throw UnimplementedError('userLogin() has not been implemented.');
   }

@@ -84,11 +84,6 @@ class WebEngagePlugin extends WebEngageFlutterPlatform {
   }
 
   @override
-  Future<void> setUserLocation(double lat, double lng) async {
-    throw UnimplementedError('setUserLocation() cannot be set on web.');
-  }
-
-  @override
   Future<void> trackEvent(String eventName,
       [Map<String, dynamic>? attributes]) async {
     return we.track(eventName, attributes);
@@ -109,6 +104,6 @@ class WebEngagePlugin extends WebEngageFlutterPlatform {
   @override
   Future<void> trackScreen(String eventName,
       [Map<String, dynamic>? screenData]) async {
-    return we.track(eventName, screenData);
+    return we.screen(eventName, screenData);
   }
 }

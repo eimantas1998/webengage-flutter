@@ -57,27 +57,6 @@ packages:
       url: "https://pub.dartlang.org"
     source: hosted
     version: "1.2.0"
-  firebase_core:
-    dependency: transitive
-    description:
-      name: firebase_core
-      url: "https://pub.dartlang.org"
-    source: hosted
-    version: "1.0.2"
-  firebase_core_platform_interface:
-    dependency: transitive
-    description:
-      name: firebase_core_platform_interface
-      url: "https://pub.dartlang.org"
-    source: hosted
-    version: "4.0.0"
-  firebase_core_web:
-    dependency: transitive
-    description:
-      name: firebase_core_web
-      url: "https://pub.dartlang.org"
-    source: hosted
-    version: "1.0.2"
   flutter:
     dependency: "direct main"
     description: flutter
@@ -213,20 +192,16 @@ packages:
   webengage_flutter_platform_interface:
     dependency: transitive
     description:
-      path: webengage_flutter_platform_interface
-      ref: federated
-      resolved-ref: "56badf1fea7d451039049063d94a71fb7ebae7d2"
-      url: "git://github.com/algirdasmac/webengage-flutter"
-    source: git
+      path: "../../webengage_flutter_platform_interface"
+      relative: true
+    source: path
     version: "2.0.0"
   webengage_flutter_web:
     dependency: transitive
     description:
-      path: webengage_flutter_web
-      ref: federated
-      resolved-ref: f4fc55d6670fa2d3029b16b13341f7a1c4acde0a
-      url: "git://github.com/algirdasmac/webengage-flutter"
-    source: git
+      path: "../../webengage_flutter_web"
+      relative: true
+    source: path
     version: "2.0.0"
 sdks:
   dart: ">=2.12.0 <3.0.0"

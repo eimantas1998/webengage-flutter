@@ -1,9 +1,12 @@
 package com.webengage.webengage_plugin;
 
+import android.app.Activity;
+import android.content.Context;
 import android.os.Handler;
 import android.os.Looper;
 import android.util.Log;
 
+import com.google.firebase.messaging.FirebaseMessaging;
 import com.webengage.sdk.android.Channel;
 import com.webengage.sdk.android.LocationTrackingStrategy;
 import com.webengage.sdk.android.WebEngage;
@@ -27,26 +30,43 @@ import io.flutter.plugin.common.MethodChannel.Result;
 import static com.webengage.webengage_plugin.Constants.ARGS.*;
 import static com.webengage.webengage_plugin.Constants.MethodName.*;
 import static com.webengage.webengage_plugin.Constants.WEBENGAGE_PLUGIN;
-
+import static com.webengage.webengage_plugin.Constants.TAG;
 
 public class WebEngagePlugin implements FlutterPlugin, MethodCallHandler, ActivityAware {
-    private static final String TAG = "WebEngagePlugin";
-
     private static MethodChannel channel;
-    private static boolean isInitialised;
     private static final Map<String, Map<String, Object>> messageQueue =
-            Collections.synchronizedMap(new LinkedHashMap());
+            Collections.synchronizedMap(new LinkedHashMap<>());
+    public static boolean isInitialised = false;
+    public static boolean isAttachedToEngine = false;
+
+    private Activity activity;
 
     @Override
     public void onAttachedToEngine(FlutterPluginBinding flutterPluginBinding) {
-        Log.w(TAG, "onAttachedToEngine on thread: " + Thread.currentThread().getName());
+        Log.d(TAG, "onAttachedToEngine on thread: " + Thread.currentThread().getName());
         this.channel = new MethodChannel(flutterPluginBinding.getBinaryMessenger(), WEBENGAGE_PLUGIN);
         channel.setMethodCallHandler(this);
+        this.isAttachedToEngine = true;
+        if (!isInitialised) {
+            initialize(flutterPluginBinding.getApplicationContext());
+        }
+        FirebaseMessaging.getInstance().getToken().addOnSuccessListener(token -> WebEngage.get().setRegistrationID(token));
+        synchronized (messageQueue) {
+            // Handle all the messages received before the Dart isolate was
+            // initialized, then clear the queue.
+            for (Map.Entry<String, Map<String, Object>> entry :
+                    messageQueue.entrySet()) {
+                sendCallback(entry.getKey(), entry.getValue());
+            }
+            messageQueue.clear();
+        }
     }
-
 
     @Override
     public void onDetachedFromEngine(FlutterPluginBinding binding) {
+        Log.d(TAG, "onDetachedFromEngine");
+        this.isAttachedToEngine = false;
+        channel.setMethodCallHandler(null);
     }
 
     @Override
@@ -56,36 +76,29 @@ public class WebEngagePlugin implements FlutterPlugin, MethodCallHandler, Activi
                 userLogin(call, result);
                 break;
 
-
             case METHOD_NAME_SET_USER_LOGOUT:
                 userLogout(call, result);
                 break;
-
 
             case METHOD_NAME_SET_USER_FIRST_NAME:
                 setUserFirstName(call, result);
                 break;
 
-
             case METHOD_NAME_SET_USER_LAST_NAME:
                 setUserLastName(call, result);
                 break;
-
 
             case METHOD_NAME_SET_USER_EMAIL:
                 setUserEmail(call, result);
                 break;
 
-
             case METHOD_NAME_SET_USER_HASHED_EMAIL:
                 setUserHashedEmail(call, result);
                 break;
 
-
             case METHOD_NAME_SET_USER_PHONE:
                 setUserPhone(call, result);
                 break;
-
 
             case METHOD_NAME_SET_USER_HASHED_PHONE:
                 setUserHashedPhone(call, result);
@@ -95,31 +108,25 @@ public class WebEngagePlugin implements FlutterPlugin, MethodCallHandler, Activi
                 setUserCompany(call, result);
                 break;
 
-
             case METHOD_NAME_SET_USER_BIRTHDATE:
                 setUserBirthDate(call, result);
                 break;
-
 
             case METHOD_NAME_SET_USER_GENDER:
                 setUserGender(call, result);
                 break;
 
-
-            case METHOD_NAME_SET_USER_OPT_IN: {
+            case METHOD_NAME_SET_USER_OPT_IN:
                 setUserOptIn(call, result);
                 break;
-            }
 
             case METHOD_NAME_SET_USER_LOCATION:
                 setUserLocation(call, result);
                 break;
 
-
             case METHOD_NAME_TRACK_EVENT:
                 trackEvent(call, result);
                 break;
-
 
             case METHOD_NAME_TRACK_SCREEN:
                 trackScreen(call, result);
@@ -127,10 +134,6 @@ public class WebEngagePlugin implements FlutterPlugin, MethodCallHandler, Activi
 
             case METHOD_NAME_SET_USER_ATTRIBUTE:
                 setUserAttribute(call, result);
-                break;
-
-            case METHOD_NAME_SET_USER_STRING_ATTRIBUTE:
-                setUserStringAttribute(call, result);
                 break;
 
             case METHOD_NAME_SET_USER_MAP_ATTRIBUTE:
@@ -142,48 +145,16 @@ public class WebEngagePlugin implements FlutterPlugin, MethodCallHandler, Activi
         }
     }
 
-    private void setUserMapAttribute(MethodCall call, Result result) {
-        Map<String, ? extends Object> attributes = call.argument(ATTRIBUTES);
-        WebEngage.get().user().setAttributes(attributes);
-        result.success(null);
-    }
-
-    private void setUserAttribute(MethodCall call, Result result) {
-        if (call.argument(ATTRIBUTES) instanceof String) {
-            String attributeName = call.argument(ATTRIBUTE_NAME);
-            String attributes = call.argument(ATTRIBUTES);
-            WebEngage.get().user().setAttribute(attributeName, attributes);
-        } else if (call.argument(ATTRIBUTES) instanceof Integer) {
-            String attributeName = call.argument(ATTRIBUTE_NAME);
-            int attributes = call.argument(ATTRIBUTES);
-            WebEngage.get().user().setAttribute(attributeName, attributes);
-        } else if (call.argument(ATTRIBUTES) instanceof Double || call.argument(ATTRIBUTES) instanceof Float) {
-            String attributeName = call.argument(ATTRIBUTE_NAME);
-            double attributes = call.argument(ATTRIBUTES);
-            WebEngage.get().user().setAttribute(attributeName, attributes);
-        } else if (call.argument(ATTRIBUTES) instanceof Date) {
-            String attributeName = call.argument(ATTRIBUTE_NAME);
-            Date attributes = call.argument(ATTRIBUTES);
-            WebEngage.get().user().setAttribute(attributeName, attributes);
-        } else if (call.argument(ATTRIBUTES) instanceof List) {
-            String attributeName = call.argument(ATTRIBUTE_NAME);
-            List<? extends Object> attributes = call.argument(ATTRIBUTES);
-            WebEngage.get().user().setAttribute(attributeName, attributes);
-        } else if (call.argument(ATTRIBUTES) instanceof Boolean) {
-            String attributeName = call.argument(ATTRIBUTE_NAME);
-            Boolean attributes = call.argument(ATTRIBUTES);
-            WebEngage.get().user().setAttribute(attributeName, attributes);
-        } else {
-            Log.d(TAG, "No other type supported");
-        }
-        result.success(null);
-    }
-
-    private void setUserStringAttribute(MethodCall call, Result result) {
-        String attributeName = call.argument(ATTRIBUTE_NAME);
-        String attributes = call.argument(ATTRIBUTES);
-        WebEngage.get().user().setAttribute(attributeName, attributes);
-        result.success(null);
+    public static void initialize(Context context) {
+        WebEngage.registerPushNotificationCallback(new WebEngageNotificationCallbacks());
+        WebEngage.registerInAppNotificationCallback(new WebEngageInAppCallbacks());
+        WebEngageConfig config =
+                new WebEngageConfig.Builder()
+                        .setLocationTrackingStrategy(LocationTrackingStrategy.ACCURACY_BEST)
+                        .build();
+        WebEngage.engage(context, config);
+        isInitialised = true;
+        WebEngageBackgroundService.onInitialized();
     }
 
     private void userLogin(MethodCall call, Result result) {
@@ -283,6 +254,43 @@ public class WebEngagePlugin implements FlutterPlugin, MethodCallHandler, Activi
         result.success(null);
     }
 
+    private void setUserMapAttribute(MethodCall call, Result result) {
+        Map<String, ? extends Object> attributes = call.argument(ATTRIBUTES);
+        WebEngage.get().user().setAttributes(attributes);
+        result.success(null);
+    }
+
+    private void setUserAttribute(MethodCall call, Result result) {
+        if (call.argument(ATTRIBUTES) instanceof String) {
+            String attributeName = call.argument(ATTRIBUTE_NAME);
+            String attributes = call.argument(ATTRIBUTES);
+            WebEngage.get().user().setAttribute(attributeName, attributes);
+        } else if (call.argument(ATTRIBUTES) instanceof Integer) {
+            String attributeName = call.argument(ATTRIBUTE_NAME);
+            int attributes = call.argument(ATTRIBUTES);
+            WebEngage.get().user().setAttribute(attributeName, attributes);
+        } else if (call.argument(ATTRIBUTES) instanceof Double || call.argument(ATTRIBUTES) instanceof Float) {
+            String attributeName = call.argument(ATTRIBUTE_NAME);
+            double attributes = call.argument(ATTRIBUTES);
+            WebEngage.get().user().setAttribute(attributeName, attributes);
+        } else if (call.argument(ATTRIBUTES) instanceof Date) {
+            String attributeName = call.argument(ATTRIBUTE_NAME);
+            Date attributes = call.argument(ATTRIBUTES);
+            WebEngage.get().user().setAttribute(attributeName, attributes);
+        } else if (call.argument(ATTRIBUTES) instanceof List) {
+            String attributeName = call.argument(ATTRIBUTE_NAME);
+            List<? extends Object> attributes = call.argument(ATTRIBUTES);
+            WebEngage.get().user().setAttribute(attributeName, attributes);
+        } else if (call.argument(ATTRIBUTES) instanceof Boolean) {
+            String attributeName = call.argument(ATTRIBUTE_NAME);
+            Boolean attributes = call.argument(ATTRIBUTES);
+            WebEngage.get().user().setAttribute(attributeName, attributes);
+        } else {
+            Log.d(TAG, "No other type supported");
+        }
+        result.success(null);
+    }
+
     private void trackEvent(MethodCall call, Result result) {
         String eventName = call.argument(EVENT_NAME);
         Map<String, Object> attributes = call.argument(ATTRIBUTES);
@@ -302,7 +310,7 @@ public class WebEngagePlugin implements FlutterPlugin, MethodCallHandler, Activi
     }
 
     static void sendOrQueueCallback(String methodName, Map<String, Object> message) {
-        if (isInitialised) {
+        if (isAttachedToEngine) {
             sendCallback(methodName, message);
         } else {
             messageQueue.put(methodName, message);
@@ -310,52 +318,31 @@ public class WebEngagePlugin implements FlutterPlugin, MethodCallHandler, Activi
     }
 
     static void sendCallback(final String methodName, final Map<String, Object> message) {
-        new Handler(Looper.getMainLooper()).post(new Runnable() {
-            @Override
-            public void run() {
-                channel.invokeMethod(methodName, message);
-            }
-        });
-    }
-
-    private void initPlugin(ActivityPluginBinding binding) {
-        if (!isInitialised) {
-            WebEngageConfig config =
-                    new WebEngageConfig.Builder()
-                            .setAutoGCMRegistrationFlag(false)
-                            .setLocationTrackingStrategy(LocationTrackingStrategy.ACCURACY_BEST)
-                            .build();
-            WebengageInitializer.initialize(binding.getActivity().getApplication(), config);
-            synchronized (messageQueue) {
-                // Handle all the messages received before the Dart isolate was
-                // initialized, then clear the queue.
-                for (Map.Entry<String, Map<String, Object>> entry :
-                        messageQueue.entrySet()) {
-                    sendCallback(entry.getKey(), entry.getValue());
-                }
-                messageQueue.clear();
-            }
-            this.isInitialised = true;
-        }
+        new Handler(Looper.getMainLooper()).post(() -> channel.invokeMethod(methodName, message));
     }
 
     @Override
     public void onAttachedToActivity(ActivityPluginBinding binding) {
-        initPlugin(binding);
-    }
-
-    @Override
-    public void onDetachedFromActivityForConfigChanges() {
-        this.isInitialised = false;
+        Log.d(TAG, "onAttachedToActivity");
+        this.activity = binding.getActivity();
+        WebEngage.get().analytics().start(activity);
     }
 
     @Override
     public void onReattachedToActivityForConfigChanges(ActivityPluginBinding binding) {
-        initPlugin(binding);
+        Log.d(TAG, "onReattachedToActivityForConfigChanges");
+        onAttachedToActivity(binding);
     }
 
     @Override
     public void onDetachedFromActivity() {
-        this.isInitialised = false;
+        Log.d(TAG, "onDetachedFromActivity");
+        WebEngage.get().analytics().stop(activity);
+    }
+
+    @Override
+    public void onDetachedFromActivityForConfigChanges() {
+        Log.d(TAG, "onDetachedFromActivityForConfigChanges");
+        onDetachedFromActivity();
     }
 }

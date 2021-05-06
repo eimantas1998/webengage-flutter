@@ -13,17 +13,18 @@ environment:
 dependencies:
   flutter:
     sdk: flutter
-  firebase_core: ^1.0.2
   webengage_flutter_platform_interface:
-    git:
-      url: git://github.com/algirdasmac/webengage-flutter
-      path: webengage_flutter_platform_interface
-      ref: federated
+    path: ../webengage_flutter_platform_interface
+    # git:
+    #   url: git://github.com/algirdasmac/webengage-flutter
+    #   path: webengage_flutter_platform_interface
+    #   ref: federated
   webengage_flutter_web:
-    git:
-      url: git://github.com/algirdasmac/webengage-flutter
-      path: webengage_flutter_web
-      ref: federated
+    path: ../webengage_flutter_web
+    # git:
+    #   url: git://github.com/algirdasmac/webengage-flutter
+    #   path: webengage_flutter_web
+    #   ref: federated
 
 dev_dependencies:
   flutter_test:

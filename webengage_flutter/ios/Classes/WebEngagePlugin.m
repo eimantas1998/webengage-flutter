@@ -3,37 +3,37 @@
 #import "WebEngagePlugin.h"
 #import "WebEngageConstants.h"
 
-NSString * const DATE_FORMAT = @"yyyy-MM-dd'T'HH:mm:ss.SSS'Z'";
-int const DATE_FORMAT_LENGTH = 24;
+NSString *const kMessagingPresentationOptionsUserDefaults =
+@"webengage_flutter_presentation_options";
 
 @implementation WebEngagePlugin {
     FlutterMethodChannel *_channel;
-    NSObject<FlutterPluginRegistrar> *_registrar;
 }
 
-- (instancetype)initWithFlutterMethodChannel:(FlutterMethodChannel *)channel
-                   andFlutterPluginRegistrar:(NSObject<FlutterPluginRegistrar> *)registrar {
+- (instancetype)initWithFlutterMethodChannel:(FlutterMethodChannel *)channel andFlutterPluginRegistrar:(NSObject<FlutterPluginRegistrar> *)registrar {
     self = [super init];
     if (self) {
         _channel = channel;
-        _registrar = registrar;
     }
     return self;
 }
 
 + (void)registerWithRegistrar:(NSObject<FlutterPluginRegistrar> *)registrar {
+    NSLog(@"[WebEngagePlugin] registerWithRegistrar");
     FlutterMethodChannel *channel = [FlutterMethodChannel methodChannelWithName:WEBENGAGE_PLUGIN binaryMessenger:[registrar messenger]];
     id instance = [[WebEngagePlugin alloc] initWithFlutterMethodChannel:channel andFlutterPluginRegistrar:registrar];
+    [WebEngage sharedInstance].pushNotificationDelegate = instance;
     [registrar addMethodCallDelegate:instance channel:channel];
+    [registrar addApplicationDelegate:instance];
 }
 
 - (BOOL)application:(UIApplication *)application didFinishLaunchingWithOptions:(NSDictionary *)launchOptions {
-    [[WebEngage sharedInstance] application:application didFinishLaunchingWithOptions:launchOptions notificationDelegate:self];
-    [WebEngage sharedInstance].pushNotificationDelegate = self;
-    return YES;
+    NSLog(@"[WebEngagePlugin] didFinishLaunchingWithOptions");
+    return [[WebEngage sharedInstance] application:application didFinishLaunchingWithOptions:launchOptions notificationDelegate:self];
 }
 
-- (BOOL)application:(UIApplication *)application continueUserActivity:(NSUserActivity *)userActivity restorationHandler:(void (^)(NSArray *_Nonnull))restorationHandler {
+- (BOOL)application:(UIApplication *)application continueUserActivity:(NSUserActivity *)userActivity restorationHandler:(void (^)(NSArray *))restorationHandler {
+    NSLog(@"[WebEngagePlugin] continueUserActivity");
     [[[WebEngage sharedInstance] deeplinkManager] getAndTrackDeeplink:userActivity.webpageURL callbackBlock:^(id location){
         [self trackDeeplinkURLCallback:location];
     }];
@@ -41,7 +41,11 @@ int const DATE_FORMAT_LENGTH = 24;
 }
 
 - (void)handleMethodCall:(FlutterMethodCall *)call result:(FlutterResult)result {
-    if ([METHOD_NAME_SET_USER_LOGIN isEqualToString:call.method]) {
+    if ([METHOD_NAME_REQUEST_PERMISSION isEqualToString:call.method]) {
+        [self messagingRequestPermission:call withResult:result];
+    } else if ([METHOD_NAME_SET_FOREGROUND_NOTIFICATION_PRESENTATION_OPTIONS isEqualToString:call.method]) {
+        [self messagingSetForegroundNotificationPresentationOptions:call withResult:result];
+    } else if ([METHOD_NAME_SET_USER_LOGIN isEqualToString:call.method]) {
         [self userLogin:call withResult:result];
     } else if ([METHOD_NAME_SET_USER_LOGOUT isEqualToString:call.method]) {
         [self userLogout:call withResult:result];
@@ -79,6 +83,77 @@ int const DATE_FORMAT_LENGTH = 24;
         result(FlutterMethodNotImplemented);
     }
 }
+
+- (void) messagingRequestPermission:(FlutterMethodCall *)call withResult:(FlutterResult)result {
+    UNUserNotificationCenter *center = [UNUserNotificationCenter currentNotificationCenter];
+    
+    UNAuthorizationOptions options = UNAuthorizationOptionNone;
+    
+    if ([call.arguments[@"alert"] isEqual:@(YES)]) {
+        options |= UNAuthorizationOptionAlert;
+    }
+    
+    if ([call.arguments[@"badge"] isEqual:@(YES)]) {
+        options |= UNAuthorizationOptionBadge;
+    }
+    
+    if ([call.arguments[@"sound"] isEqual:@(YES)]) {
+        options |= UNAuthorizationOptionSound;
+    }
+    
+    if ([call.arguments[@"provisional"] isEqual:@(YES)]) {
+        if (@available(iOS 12.0, *)) {
+            options |= UNAuthorizationOptionProvisional;
+        }
+    }
+    
+    if ([call.arguments[@"announcement"] isEqual:@(YES)]) {
+        if (@available(iOS 13.0, *)) {
+            options |= UNAuthorizationOptionAnnouncement;
+        }
+    }
+    
+    if ([call.arguments[@"carPlay"] isEqual:@(YES)]) {
+        options |= UNAuthorizationOptionCarPlay;
+    }
+    
+    if ([call.arguments[@"criticalAlert"] isEqual:@(YES)]) {
+        if (@available(iOS 12.0, *)) {
+            options |= UNAuthorizationOptionCriticalAlert;
+        }
+    }
+    
+    id handler = ^(BOOL granted, NSError *_Nullable error) {
+        if (error != nil) {
+            result(@(NO));
+        } else {
+            [center getNotificationSettingsWithCompletionHandler:^(
+                                                                   UNNotificationSettings *_Nonnull settings) {
+                result(@(YES));
+            }];
+        }
+    };
+    
+    [center requestAuthorizationWithOptions:options completionHandler:handler];
+}
+
+- (void)messagingSetForegroundNotificationPresentationOptions:(FlutterMethodCall *)call withResult:(FlutterResult)result {
+    NSMutableDictionary *persistedOptions = [NSMutableDictionary dictionary];
+    if ([call.arguments[@"alert"] isEqual:@(YES)]) {
+        persistedOptions[@"alert"] = @YES;
+    }
+    if ([call.arguments[@"badge"] isEqual:@(YES)]) {
+        persistedOptions[@"badge"] = @YES;
+    }
+    if ([call.arguments[@"sound"] isEqual:@(YES)]) {
+        persistedOptions[@"sound"] = @YES;
+    }
+    
+    [[NSUserDefaults standardUserDefaults] setObject:persistedOptions
+                                              forKey:kMessagingPresentationOptionsUserDefaults];
+    result(nil);
+}
+
 
 - (void) userLogin:(FlutterMethodCall *)call withResult:(FlutterResult)result {
     NSString * userId = call.arguments;
@@ -161,7 +236,13 @@ int const DATE_FORMAT_LENGTH = 24;
     NSLocale* locale = [NSLocale localeWithLocaleIdentifier:@"en_US"];
     NSString* ch = [channel lowercaseStringWithLocale:locale];
     
-    BOOL status = call.arguments[OPTIN];
+    BOOL status;
+    
+    if ([call.arguments[OPTIN] isEqual:@(YES)]) {
+        status = YES;
+    } else {
+        status = NO;
+    }
     
     WEGUser * weUser = [WebEngage sharedInstance].user;
     
@@ -225,7 +306,7 @@ int const DATE_FORMAT_LENGTH = 24;
     id value = call.arguments[ATTRIBUTES];
     WEGUser * weUser = [WebEngage sharedInstance].user;
     if ([value isKindOfClass:[NSString class]]) {
-        if ([value length] == DATE_FORMAT_LENGTH) {
+        if ([value length] == 24) {
             NSDate * date = [self getDate:value];
             if (date != nil) {
                 [weUser setAttribute:attributeName withDateValue:date];
@@ -260,40 +341,130 @@ int const DATE_FORMAT_LENGTH = 24;
 
 - (NSDate *)getDate:(NSString *)strValue {
     NSDateFormatter * dateFormatter = [[NSDateFormatter alloc] init];
-    [dateFormatter setDateFormat:DATE_FORMAT];
+    [dateFormatter setDateFormat:@"yyyy-MM-dd'T'HH:mm:ss.SSS'Z'"];
     [dateFormatter setTimeZone:[NSTimeZone timeZoneWithAbbreviation:@"UTC"]];
     NSDate * date = [dateFormatter dateFromString:strValue];
     return date;
 }
 
--(void)WEGHandleDeeplink:(NSString *)deeplink userData:(NSDictionary *)data{
-    NSDictionary *payload = @{LINK:deeplink,DATA:data};
+- (void)userNotificationCenter:(UNUserNotificationCenter *)center willPresentNotification:(UNNotification *)notification withCompletionHandler:(void (^)(UNNotificationPresentationOptions options))completionHandler {
+    if ([notification.request.content.userInfo[@"source"] isEqual:@"webengage"]) {
+        NSLog(@"[WebEngagePlugin] willPresentNotification");
+        NSMutableDictionary *customData = [[NSMutableDictionary alloc] init];
+        for (NSDictionary* pair in notification.request.content.userInfo[@"customData"])
+        {
+            [customData setValue:pair[@"value"] forKey:pair[@"key"]];
+        }
+        NSDictionary *payload = @{
+            TITLE: notification.request.content.title,
+            MESSAGE: notification.request.content.body,
+            STATE: NOTIFICATION_STATE_SHOWN,
+            DATA: customData,
+        };
+        [_channel invokeMethod:METHOD_NAME_ON_PUSH arguments:payload];
+    }
+    
+    UNNotificationPresentationOptions presentationOptions = UNNotificationPresentationOptionNone;
+    NSDictionary *persistedOptions = [[NSUserDefaults standardUserDefaults]
+                                      dictionaryForKey:kMessagingPresentationOptionsUserDefaults];
+    if (persistedOptions != nil) {
+        if ([persistedOptions[@"alert"] isEqual:@(YES)]) {
+            presentationOptions |= UNNotificationPresentationOptionAlert;
+        }
+        if ([persistedOptions[@"badge"] isEqual:@(YES)]) {
+            presentationOptions |= UNNotificationPresentationOptionBadge;
+        }
+        if ([persistedOptions[@"sound"] isEqual:@(YES)]) {
+            presentationOptions |= UNNotificationPresentationOptionSound;
+        }
+    }
+    completionHandler(presentationOptions);
+}
+
+- (void)userNotificationCenter:(UNUserNotificationCenter *)center didReceiveNotificationResponse:(UNNotificationResponse *)response withCompletionHandler:(void(^)(void))completionHandler {
+    if ([response.actionIdentifier isEqualToString:UNNotificationDismissActionIdentifier] &&
+        [response.notification.request.content.userInfo[@"source"] isEqual:@"webengage"]) {
+        NSLog(@"[WebEngagePlugin] didReceiveNotificationResponse");
+        NSMutableDictionary *customData = [[NSMutableDictionary alloc] init];
+        for (NSDictionary* pair in response.notification.request.content.userInfo[@"customData"])
+        {
+            [customData setValue:pair[@"value"] forKey:pair[@"key"]];
+        }
+        NSDictionary *payload = @{
+            TITLE: response.notification.request.content.title,
+            MESSAGE: response.notification.request.content.body,
+            STATE: NOTIFICATION_STATE_DISMISSED,
+            DATA: customData,
+        };
+        [_channel invokeMethod:METHOD_NAME_ON_PUSH arguments:payload];
+    }
+    completionHandler();
+}
+
+- (void)WEGHandleDeeplink:(NSString *)deeplink userData:(NSDictionary *)data {
+    NSLog(@"[WebEngagePlugin] WEGHandleDeeplink");
+    NSMutableDictionary *customData = [[NSMutableDictionary alloc] init];
+    for (NSDictionary* pair in data[@"customData"])
+    {
+        [customData setValue:pair[@"value"] forKey:pair[@"key"]];
+    }
+    NSDictionary *payload = @{
+        TITLE: data[@"aps"][@"alert"][@"title"],
+        MESSAGE: data[@"aps"][@"alert"][@"body"],
+        STATE: NOTIFICATION_STATE_CLICKED,
+        DATA: customData,
+        LINK: deeplink,
+    };
     [_channel invokeMethod:METHOD_NAME_ON_PUSH arguments:payload];
 }
 
--(NSDictionary *)notificationPrepared:(NSDictionary<NSString *,id> *)inAppNotificationData shouldStop:(BOOL *)stopRendering{
-    NSDictionary *payload = @{STATE:IN_APP_STATE_PREPARED,DATA:inAppNotificationData};
+- (NSDictionary *)notificationPrepared:(NSDictionary<NSString *,id> *)inAppNotificationData shouldStop:(BOOL *)stopRendering {
+    NSLog(@"[WebEngagePlugin] notificationPrepared");
+    NSDictionary *payload = @{
+        STATE:IN_APP_STATE_PREPARED,
+        DATA:inAppNotificationData,
+    };
     [_channel invokeMethod:METHOD_NAME_ON_IN_APP arguments:payload];
     return inAppNotificationData;
 }
 
--(void)notificationShown:(NSDictionary<NSString *,id> *)inAppNotificationData{
-    NSDictionary *payload = @{STATE:IN_APP_STATE_SHOWN,DATA:inAppNotificationData};
+- (void)notificationShown:(NSDictionary<NSString *,id> *)inAppNotificationData {
+    NSLog(@"[WebEngagePlugin] notificationShown");
+    NSDictionary *payload = @{
+        STATE:IN_APP_STATE_SHOWN,
+        DATA:inAppNotificationData,
+    };
     [_channel invokeMethod:METHOD_NAME_ON_IN_APP arguments:payload];
 }
 
--(void)notificationDismissed:(NSDictionary<NSString *,id> *)inAppNotificationData{
-    NSDictionary *payload = @{STATE:IN_APP_STATE_DISSMISSED,DATA:inAppNotificationData};
+- (void)notificationDismissed:(NSDictionary<NSString *,id> *)inAppNotificationData {
+    NSLog(@"[WebEngagePlugin] notificationDismissed");
+    NSDictionary *payload = @{
+        STATE:IN_APP_STATE_DISMISSED,
+        DATA:inAppNotificationData,
+    };
     [_channel invokeMethod:METHOD_NAME_ON_IN_APP arguments:payload];
 }
 
--(void)notification:(NSMutableDictionary<NSString *,id> *)inAppNotificationData clickedWithAction:(NSString *)actionId{
-    [inAppNotificationData setObject:actionId forKey:SELECTED_ACTION_ID];
-    NSDictionary *payload = @{STATE:IN_APP_STATE_CLICKED,DATA:inAppNotificationData};
+- (void)notification:(NSMutableDictionary<NSString *,id> *)inAppNotificationData clickedWithAction:(NSString *)actionId {
+    NSLog(@"[WebEngagePlugin] notification clickedWithAction");
+    NSMutableDictionary *payload = [[NSMutableDictionary alloc] init];
+    [payload setValue:IN_APP_STATE_CLICKED forKey:STATE];
+    [payload setValue:inAppNotificationData forKey:DATA];
+    if (actionId != (id)[NSNull null] && actionId.length > 0 ) {
+        for (NSDictionary* action in inAppNotificationData[@"actions"])
+        {
+            if ([actionId isEqualToString:action[@"actionEId"]]) {
+                [payload setValue:action[@"actionLink"] forKey:LINK];
+            }
+        }
+    }
+    
     [_channel invokeMethod:METHOD_NAME_ON_IN_APP arguments:payload];
 }
 
 - (void)trackDeeplinkURLCallback:(NSString *)redirectLocationURL {
+    NSLog(@"[WebEngagePlugin] trackDeeplinkURLCallback");
     [_channel invokeMethod:METHOD_NAME_ON_DEEP_LINK arguments:redirectLocationURL];
 }
 

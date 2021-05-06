@@ -10,6 +10,8 @@
 
 #define WEBENGAGE_PLUGIN @"webengage_flutter"
 
+#define METHOD_NAME_REQUEST_PERMISSION @"requestPermission"
+#define METHOD_NAME_SET_FOREGROUND_NOTIFICATION_PRESENTATION_OPTIONS @"setForegroundNotificationPresentationOptions"
 #define METHOD_NAME_SET_USER_LOGIN @"userLogin"
 #define METHOD_NAME_SET_USER_LOGOUT @"userLogout"
 #define METHOD_NAME_SET_USER_FIRST_NAME @"setUserFirstName"
@@ -24,7 +26,6 @@
 #define METHOD_NAME_SET_USER_OPT_IN @"setUserOptIn"
 #define METHOD_NAME_SET_USER_LOCATION @"setUserLocation"
 #define METHOD_NAME_SET_USER_ATTRIBUTE @"setUserAttribute"
-#define METHOD_NAME_SET_USER_STRING_ATTRIBUTE @"setUserStringAttribute"
 #define METHOD_NAME_SET_USER_MAP_ATTRIBUTE @"setUserMapAttribute"
 #define METHOD_NAME_TRACK_EVENT @"trackEvent"
 #define METHOD_NAME_TRACK_SCREEN @"trackScreen"
@@ -35,13 +36,17 @@
 #define DATA @"data"
 #define LINK @"link"
 #define STATE @"state"
+#define TITLE @"title"
+#define MESSAGE @"message"
 
 #define IN_APP_STATE_PREPARED @"prepared"
 #define IN_APP_STATE_SHOWN @"shown"
-#define IN_APP_STATE_DISSMISSED @"dissmissed"
+#define IN_APP_STATE_DISMISSED @"dismissed"
 #define IN_APP_STATE_CLICKED @"clicked"
 
-#define SELECTED_ACTION_ID @"selectedActionId"
+#define NOTIFICATION_STATE_SHOWN @"shown"
+#define NOTIFICATION_STATE_DISMISSED @"dismissed"
+#define NOTIFICATION_STATE_CLICKED @"clicked"
 
 #define CHANNEL @"channel"
 #define OPTIN @"optIn"
@@ -50,6 +55,9 @@
 #define EMAIL @"email"
 #define IN_APP @"in_app"
 #define WHATSAPP @"whatsapp"
+#define MALE @"male"
+#define FEMALE @"female"
+#define OTHER @"other"
 #define LAT @"lat"
 #define LNG @"lng"
 #define EVENT_NAME @"eventName"
