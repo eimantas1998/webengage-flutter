@@ -7,6 +7,9 @@ import 'package:js/js.dart';
 external WebEngageUserJsImpl get user;
 
 @JS()
+external void init(String key);
+
+@JS()
 external void track(String eventName, [Object? eventData]);
 
 @JS()

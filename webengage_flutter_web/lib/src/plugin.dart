@@ -1,6 +1,8 @@
 import 'webengage_interop.dart' as webengage_interop;
 import 'utils.dart';
 
+void init(String key) => webengage_interop.init(key);
+
 void track(String event, [Map<String, dynamic>? data]) {
   if (data != null) {
     webengage_interop.track(event, jsify(data));

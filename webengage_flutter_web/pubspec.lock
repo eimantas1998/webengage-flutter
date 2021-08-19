@@ -7,7 +7,7 @@ packages:
       name: async
       url: "https://pub.dartlang.org"
     source: hosted
-    version: "2.5.0"
+    version: "2.6.1"
   boolean_selector:
     dependency: transitive
     description:
@@ -99,7 +99,7 @@ packages:
       name: plugin_platform_interface
       url: "https://pub.dartlang.org"
     source: hosted
-    version: "2.0.0"
+    version: "2.0.1"
   sky_engine:
     dependency: transitive
     description: flutter
@@ -111,7 +111,7 @@ packages:
       name: source_span
       url: "https://pub.dartlang.org"
     source: hosted
-    version: "1.8.0"
+    version: "1.8.1"
   stack_trace:
     dependency: transitive
     description:
@@ -146,7 +146,7 @@ packages:
       name: test_api
       url: "https://pub.dartlang.org"
     source: hosted
-    version: "0.2.19"
+    version: "0.3.0"
   typed_data:
     dependency: transitive
     description:
@@ -166,10 +166,10 @@ packages:
     description:
       path: webengage_flutter_platform_interface
       ref: federated
-      resolved-ref: "5565fc08f5bb0f052fbf6925001a38ef258264d0"
+      resolved-ref: "46ff1d684762520abc01810f4f3920ea6b5d152a"
       url: "git://github.com/algirdasmac/webengage-flutter"
     source: git
-    version: "2.0.0"
+    version: "2.1.0"
 sdks:
   dart: ">=2.12.0 <3.0.0"
   flutter: ">=1.22.0"
