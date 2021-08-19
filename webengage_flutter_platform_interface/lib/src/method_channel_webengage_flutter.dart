@@ -186,4 +186,7 @@ class MethodChannelWebEngageFlutter extends WebEngageFlutterPlatform {
     return _channel.invokeMethod(METHOD_NAME_TRACK_SCREEN,
         {SCREEN_NAME: eventName, SCREEN_DATA: screenData});
   }
+
+  @override
+  void webInitialize(String key) {}
 }

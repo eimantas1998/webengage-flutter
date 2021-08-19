@@ -36,6 +36,10 @@ abstract class WebEngageFlutterPlatform extends PlatformInterface {
     _instance = instance;
   }
 
+  void webInitialize(String key) {
+    throw UnimplementedError('webInitialize() has not been implemented.');
+  }
+
   /// Prompts the user for notification permissions.
   ///
   /// On iOS, a dialog is shown requesting the users permission.
