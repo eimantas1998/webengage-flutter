@@ -208,4 +208,8 @@ class WebEngagePlugin {
       [Map<String, dynamic>? screenData]) async {
     await _platfomInstace.trackScreen(eventName, screenData);
   }
+
+  void webInitialize(String key) {
+    _platfomInstace.webInitialize(key);
+  }
 }
