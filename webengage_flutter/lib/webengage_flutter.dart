@@ -209,7 +209,7 @@ class WebEngagePlugin {
     await _platfomInstace.trackScreen(eventName, screenData);
   }
 
-  void webInitialize(String key) {
+  static void webInitialize(String key) {
     _platfomInstace.webInitialize(key);
   }
 }
