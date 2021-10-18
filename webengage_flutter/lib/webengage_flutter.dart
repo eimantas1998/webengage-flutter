@@ -13,35 +13,14 @@ export 'package:webengage_flutter_platform_interface/webengage_flutter_platform_
 class WebEngagePlugin {
   static final _platfomInstace = WebEngageFlutterPlatform.instance;
 
-  static final _onPushController =
-      StreamController<PushNotification>.broadcast(onListen: () {
-    Stream<PushNotification> onPushStream =
-        WebEngageFlutterPlatform.onPush.stream;
+  static Stream<PushNotification> get onPush =>
+      WebEngageFlutterPlatform.onPush.stream;
 
-    onPushStream.pipe(_onPushController);
-  });
+  static Stream<InAppMessage> get onInApp =>
+      WebEngageFlutterPlatform.onInApp.stream;
 
-  static Stream<PushNotification> get onPush => _onPushController.stream;
-
-  static final _onInAppController =
-      StreamController<InAppMessage>.broadcast(onListen: () {
-    Stream<InAppMessage> onInAppStream =
-        WebEngageFlutterPlatform.onInApp.stream;
-
-    onInAppStream.pipe(_onInAppController);
-  });
-
-  static Stream<InAppMessage> get onInApp => _onInAppController.stream;
-
-  static final _onDeepLinkController =
-      StreamController<String>.broadcast(onListen: () {
-    Stream<String> onDeepLinkStream =
-        WebEngageFlutterPlatform.onDeepLink.stream;
-
-    onDeepLinkStream.pipe(_onDeepLinkController);
-  });
-
-  static Stream<String> get onDeepLink => _onDeepLinkController.stream;
+  static Stream<String> get onDeepLink =>
+      WebEngageFlutterPlatform.onDeepLink.stream;
 
   /// Prompts the user for notification permissions.
   ///

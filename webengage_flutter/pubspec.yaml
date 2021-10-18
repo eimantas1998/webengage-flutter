@@ -1,7 +1,6 @@
 name: webengage_flutter
 description: WebEngage Flutter plugin.
-version: 2.1.1
-author: WebEngage
+version: 2.1.2
 homepage: https://webengage.com/
 repository: https://github.com/WebEngage/webengage-flutter
 publish_to: none
