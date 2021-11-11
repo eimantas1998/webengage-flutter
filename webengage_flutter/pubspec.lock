@@ -99,7 +99,7 @@ packages:
       name: plugin_platform_interface
       url: "https://pub.dartlang.org"
     source: hosted
-    version: "2.0.0"
+    version: "2.0.2"
   sky_engine:
     dependency: transitive
     description: flutter
@@ -166,7 +166,7 @@ packages:
     description:
       path: webengage_flutter_platform_interface
       ref: federated
-      resolved-ref: d5584db2d5c4b279dffe14e8a7ff7cdb1fbc8393
+      resolved-ref: "200ec914598a39937547d5d6de19d84480f40465"
       url: "git://github.com/algirdasmac/webengage-flutter"
     source: git
     version: "2.1.0"
@@ -175,7 +175,7 @@ packages:
     description:
       path: webengage_flutter_web
       ref: federated
-      resolved-ref: d5584db2d5c4b279dffe14e8a7ff7cdb1fbc8393
+      resolved-ref: "200ec914598a39937547d5d6de19d84480f40465"
       url: "git://github.com/algirdasmac/webengage-flutter"
     source: git
     version: "2.0.0"
