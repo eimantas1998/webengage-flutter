@@ -179,7 +179,7 @@ packages:
       path: webengage_flutter_platform_interface
       ref: federated
       resolved-ref: "200ec914598a39937547d5d6de19d84480f40465"
-      url: "git://github.com/algirdasmac/webengage-flutter"
+      url: "git://github.com/eimantas1998/webengage-flutter"
     source: git
     version: "2.1.0"
 sdks:

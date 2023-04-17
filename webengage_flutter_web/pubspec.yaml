@@ -1,7 +1,7 @@
 name: webengage_flutter_web
 description: The web implementation of webengage_flutter
 homepage: https://webengage.com/
-version: 2.0.1
+version: 2.0.2
 publish_to: none
 
 environment:
@@ -16,7 +16,7 @@ dependencies:
   webengage_flutter_platform_interface:
     # path: ../webengage_flutter_platform_interface
     git:
-      url: git://github.com/algirdasmac/webengage-flutter
+      url: git://github.com/eimantas1998/webengage-flutter
       path: webengage_flutter_platform_interface
       ref: federated
   js: ^0.6.3

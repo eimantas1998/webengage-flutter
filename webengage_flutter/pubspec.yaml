@@ -1,6 +1,6 @@
 name: webengage_flutter
 description: WebEngage Flutter plugin.
-version: 2.1.6
+version: 2.1.7
 homepage: https://webengage.com/
 repository: https://github.com/WebEngage/webengage-flutter
 publish_to: none
@@ -14,12 +14,12 @@ dependencies:
     sdk: flutter
   webengage_flutter_platform_interface:
     git:
-      url: git://github.com/algirdasmac/webengage-flutter
+      url: git://github.com/eimantas1998/webengage-flutter
       path: webengage_flutter_platform_interface
       ref: federated
   webengage_flutter_web:
     git:
-      url: git://github.com/algirdasmac/webengage-flutter
+      url: git://github.com/eimantas1998/webengage-flutter
       path: webengage_flutter_web
       ref: federated
 
