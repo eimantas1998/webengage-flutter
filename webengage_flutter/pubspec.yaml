@@ -13,13 +13,11 @@ dependencies:
   flutter:
     sdk: flutter
   webengage_flutter_platform_interface:
-    # path: ../webengage_flutter_platform_interface
     git:
       url: git://github.com/algirdasmac/webengage-flutter
       path: webengage_flutter_platform_interface
       ref: federated
   webengage_flutter_web:
-    # path: ../webengage_flutter_web
     git:
       url: git://github.com/algirdasmac/webengage-flutter
       path: webengage_flutter_web
