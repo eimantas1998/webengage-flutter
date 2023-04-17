@@ -203,7 +203,7 @@ packages:
       path: ".."
       relative: true
     source: path
-    version: "2.1.6"
+    version: "2.1.8"
   webengage_flutter_platform_interface:
     dependency: transitive
     description:
@@ -218,10 +218,10 @@ packages:
     description:
       path: webengage_flutter_web
       ref: federated
-      resolved-ref: d5584db2d5c4b279dffe14e8a7ff7cdb1fbc8393
+      resolved-ref: "7e83f88cd85adfcf8f9acfd1b8ba368e75eeaa48"
       url: "git://github.com/eimantas1998/webengage-flutter"
     source: git
-    version: "2.0.0"
+    version: "2.0.2"
 sdks:
   dart: ">=2.18.0 <3.0.0"
   flutter: ">=1.22.0"

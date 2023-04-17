@@ -187,10 +187,10 @@ packages:
     description:
       path: webengage_flutter_web
       ref: federated
-      resolved-ref: "200ec914598a39937547d5d6de19d84480f40465"
+      resolved-ref: "7e83f88cd85adfcf8f9acfd1b8ba368e75eeaa48"
       url: "git://github.com/eimantas1998/webengage-flutter"
     source: git
-    version: "2.0.0"
+    version: "2.0.2"
 sdks:
   dart: ">=2.18.0 <3.0.0"
   flutter: ">=1.22.0"
