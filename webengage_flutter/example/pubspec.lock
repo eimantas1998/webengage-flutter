@@ -203,7 +203,7 @@ packages:
       path: ".."
       relative: true
     source: path
-    version: "2.1.9"
+    version: "2.1.10"
   webengage_flutter_platform_interface:
     dependency: transitive
     description:
