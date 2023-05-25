@@ -5,8 +5,6 @@ import android.content.Context;
 import android.os.Handler;
 import android.os.Looper;
 import android.util.Log;
-import android.content.pm.PackageManager;
-import android.os.Bundle;
 
 import com.google.firebase.messaging.FirebaseMessaging;
 import com.webengage.sdk.android.Channel;
@@ -42,28 +40,6 @@ public class WebEngagePlugin implements FlutterPlugin, MethodCallHandler, Activi
     public static boolean isAttachedToEngine = false;
 
     private Activity activity;
-
-    public static String getPackageName(Context context) {
-        try {
-            return context.getPackageManager().getPackageInfo(
-                    context.getPackageName(), 0).packageName;
-        } catch (PackageManager.NameNotFoundException e) {
-            e.printStackTrace();
-        }
-        return null;
-    }
-
-    public static String getMetadata(Context context, String key) {
-        try {
-            Bundle metaData = context.getPackageManager()
-                    .getApplicationInfo(context.getPackageName(),
-                            PackageManager.GET_META_DATA).metaData;
-            return metaData.get(key).toString();
-        } catch (PackageManager.NameNotFoundException e) {
-            e.printStackTrace();
-        }
-        return null;
-    }
 
     @Override
     public void onAttachedToEngine(FlutterPluginBinding flutterPluginBinding) {
@@ -172,7 +148,7 @@ public class WebEngagePlugin implements FlutterPlugin, MethodCallHandler, Activi
         WebEngage.registerInAppNotificationCallback(new WebEngageInAppCallbacks());
         WebEngageConfig config =
                 new WebEngageConfig.Builder()
-                        .setWebEngageKey(getMetadata(context, "com.webengage.sdk.android.key"))
+                        .setLocationTrackingStrategy(LocationTrackingStrategy.ACCURACY_BEST)
                         .build();
         WebEngage.engage(context, config);
         isInitialised = true;

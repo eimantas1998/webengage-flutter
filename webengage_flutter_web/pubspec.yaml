@@ -1,7 +1,7 @@
 name: webengage_flutter_web
 description: The web implementation of webengage_flutter
 homepage: https://webengage.com/
-version: 2.1.10
+version: 2.1.14
 publish_to: none
 
 environment:

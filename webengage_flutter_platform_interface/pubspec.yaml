@@ -3,7 +3,7 @@ description: A common platform interface for the webengage_flutter plugin.
 homepage: https://github.com/WebEngage/webengage-flutter/url_launcher_platform_interface
 # NOTE: We strongly prefer non-breaking changes, even at the expense of a
 # less-clean API. See https://flutter.dev/go/platform-interface-breaking-changes
-version: 2.1.10
+version: 2.1.14
 
 dependencies:
   flutter:
