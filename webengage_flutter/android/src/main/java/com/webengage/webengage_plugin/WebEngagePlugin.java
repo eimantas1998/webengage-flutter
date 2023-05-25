@@ -41,6 +41,28 @@ public class WebEngagePlugin implements FlutterPlugin, MethodCallHandler, Activi
 
     private Activity activity;
 
+    public static String getPackageName(Context context) {
+        try {
+            return context.getPackageManager().getPackageInfo(
+                    context.getPackageName(), 0).packageName;
+        } catch (PackageManager.NameNotFoundException e) {
+            e.printStackTrace();
+        }
+        return null;
+    }
+
+    public static String getMetadata(Context context, String key) {
+        try {
+            Bundle metaData = context.getPackageManager()
+                    .getApplicationInfo(context.getPackageName(),
+                            PackageManager.GET_META_DATA).metaData;
+            return metaData.get(key).toString();
+        } catch (PackageManager.NameNotFoundException e) {
+            e.printStackTrace();
+        }
+        return null;
+    }
+
     @Override
     public void onAttachedToEngine(FlutterPluginBinding flutterPluginBinding) {
         this.channel = new MethodChannel(flutterPluginBinding.getBinaryMessenger(), WEBENGAGE_PLUGIN);
@@ -148,7 +170,7 @@ public class WebEngagePlugin implements FlutterPlugin, MethodCallHandler, Activi
         WebEngage.registerInAppNotificationCallback(new WebEngageInAppCallbacks());
         WebEngageConfig config =
                 new WebEngageConfig.Builder()
-                        .setLocationTrackingStrategy(LocationTrackingStrategy.ACCURACY_BEST)
+                        .setWebEngageKey(getMetadata(context, "com.webengage.sdk.android.key"))
                         .build();
         WebEngage.engage(context, config);
         isInitialised = true;
