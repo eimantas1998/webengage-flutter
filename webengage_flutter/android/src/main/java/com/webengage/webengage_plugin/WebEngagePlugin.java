@@ -5,6 +5,7 @@ import android.content.Context;
 import android.os.Handler;
 import android.os.Looper;
 import android.util.Log;
+import android.os.Bundle;
 
 import com.google.firebase.messaging.FirebaseMessaging;
 import com.webengage.sdk.android.Channel;
