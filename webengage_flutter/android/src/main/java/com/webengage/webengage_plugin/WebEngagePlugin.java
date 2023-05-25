@@ -5,6 +5,7 @@ import android.content.Context;
 import android.os.Handler;
 import android.os.Looper;
 import android.util.Log;
+import android.content.pm.PackageManager;
 import android.os.Bundle;
 
 import com.google.firebase.messaging.FirebaseMessaging;
